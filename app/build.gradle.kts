@@ -48,4 +48,6 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-auth")
     implementation("de.svenkubiak:jBCrypt:0.4.3")
+    implementation("com.airbnb.android:lottie:6.2.0")
+    implementation("jp.wasabeef:blurry:4.0.1")
 }

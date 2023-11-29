@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".TestGameActivity"
+    android:fitsSystemWindows="true"
+    android:gravity="center_horizontal" >
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/homepageBG"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:duplicateParentState="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:lottie_autoPlay="true"
+        app:lottie_rawRes="@raw/one_homepage_bg"
+        app:lottie_loop="true"
+        android:scaleType="centerCrop"
+        tools:ignore="MissingConstraints" />
+
+    <Button
+        android:id="@+id/btnPlayMusic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Play Music"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.242"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.067" />
+
+    <Button
+        android:id="@+id/btnPauseMusic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Pause Music"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.467"
+        app:layout_constraintStart_toEndOf="@+id/btnPlayMusic"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.067" />
+
+    <Button
+        android:id="@+id/btnButtonClickSound"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:text="Button Click Sound"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.078"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnPlayMusic"
+        app:layout_constraintVertical_bias="0.054" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
