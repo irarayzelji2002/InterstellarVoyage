@@ -2,6 +2,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.gms.google-services")
+    id("kotlin-kapt")
 }
 
 android {
@@ -50,4 +51,6 @@ dependencies {
     implementation("de.svenkubiak:jBCrypt:0.4.3")
     implementation("com.airbnb.android:lottie:6.2.0")
     implementation("jp.wasabeef:blurry:4.0.1")
+    implementation("com.github.bumptech.glide:glide:4.13.0")
+    kapt("com.github.bumptech.glide:compiler:4.13.0")
 }

@@ -2,6 +2,7 @@ package com.example.interstellarvoyage
 
 import android.content.Intent
 import android.graphics.Color
+import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
@@ -10,13 +11,19 @@ import android.widget.Button
 import com.airbnb.lottie.LottieAnimationView
 
 class HomepageActivity : AppCompatActivity() {
+    private var musicPlayerCallback: MusicPlayerCallback? = null
+
+    fun setMusicPlayerCallback(callback: MusicPlayerCallback) {
+        musicPlayerCallback = callback
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_homepage)
 
         // Adjust position of title by percent
         val rootView = findViewById<View>(R.id.rootView)
-        val myView = findViewById<View>(R.id.title)
+        val myView = findViewById<View>(R.id.lottieTitle)
         rootView.viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
             override fun onPreDraw(): Boolean {
                 rootView.viewTreeObserver.removeOnPreDrawListener(this)
@@ -31,6 +38,8 @@ class HomepageActivity : AppCompatActivity() {
         var btnOptions : Button = findViewById(R.id.btnOptions)
         var btnLeaderboard : Button = findViewById(R.id.btnLeaderboard)
         var btnPlaySpaceship : LottieAnimationView = findViewById(R.id.btnPlaySpaceship)
+
+        musicPlayerCallback?.transitionMusic("homepage")
 
         btnMissions.setOnClickListener {
             startActivity(Intent(this, MissionsActivity::class.java))

@@ -13,7 +13,7 @@ import java.util.concurrent.CompletableFuture
 class TestDatabaseActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_test_databse)
+        setContentView(R.layout.activity_test_database)
 
         var btnRegAccount : Button = findViewById(R.id.btnRegAccount)
         var btnAccess : Button = findViewById(R.id.btnAccess)
