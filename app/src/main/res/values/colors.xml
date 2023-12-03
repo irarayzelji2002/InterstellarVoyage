@@ -5,4 +5,12 @@
     <color name="indigo">#0f0d25</color>s
     <color name="textIndigo">#1e1955</color>
     <color name="lightyellow">#ffce77</color>
+    <color name="goldtext">#efc34d</color>
+    <color name="silvertext">#e4e3e3</color>
+    <color name="bronzetext">#f0bf88</color>
+    <color name="irontext">#c1c1c1</color>
+    <color name="whitebuttontext">#4d4d4d</color>
+    <color name="edttext">#0f0d25</color>
+    <color name="redtext">#ffadad</color>
+    <color name="bluelink">#5ed3ff</color>
 </resources>

@@ -26,6 +26,130 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:gravity="center">
+        <!--DELETE ACCOUNT TITLE-->
+        <TextView
+            android:id="@+id/txtDeleteAccountTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/sharpsans_bold"
+            android:text="DELETE ACCOUNT"
+            android:textAlignment="center"
+            android:textSize="30dp"
+            android:layout_marginTop="-60dp"/>
+
+        <!--EDIT USER INFO-->
+        <LinearLayout
+            android:id="@+id/deleteAccountContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="30dp"
+            android:background="@drawable/blur_bg"
+            app:layout_constraintTop_toBottomOf="@id/txtDeleteAccountTitle"
+            tools:layout_editor_absoluteX="20dp"
+            android:padding="18dp"
+            android:gravity="center_horizontal|bottom"
+            android:orientation="vertical">
+
+            <!--Email Address-->
+            <LinearLayout
+                android:id="@+id/emailAddressContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/txtEmailAddressLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/sharpsans_bold"
+                    android:textAlignment="viewStart"
+                    android:paddingVertical="3dp"
+                    android:text="Email Address"
+                    android:textColor="#FFFFFF"
+                    android:textSize="18sp"
+                    android:layout_alignParentLeft="true"/>
+                <EditText
+                    android:id="@+id/editTextEmailAddress"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:ems="10"
+                    android:hint="Email Address"
+                    android:inputType="textEmailAddress"
+                    android:background="@drawable/edt_bg"
+                    android:fontFamily="@font/sharpsans"
+                    android:textSize="16sp"
+                    android:textColor="@color/edttext"
+                    android:paddingHorizontal="20dp" />
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/paswordContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="10dp">
+                <TextView
+                    android:id="@+id/txtPasswordLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/sharpsans_bold"
+                    android:textAlignment="viewStart"
+                    android:paddingVertical="3dp"
+                    android:text="Password"
+                    android:textColor="#FFFFFF"
+                    android:textSize="18sp"
+                    android:layout_alignParentLeft="true"/>
+                <EditText
+                    android:id="@+id/editTextPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:ems="10"
+                    android:hint="Password"
+                    android:inputType="textPassword"
+                    android:background="@drawable/edt_bg"
+                    android:fontFamily="@font/sharpsans"
+                    android:textSize="16sp"
+                    android:textColor="@color/edttext"
+                    android:paddingHorizontal="20dp" />
+            </LinearLayout>
+            <TextView
+                android:id="@+id/deleteAccountErr"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/sharpsans_medium"
+                android:textAlignment="viewStart"
+                android:paddingVertical="3dp"
+                android:layout_marginTop="5dp"
+                android:text="Error message of delete account"
+                android:justificationMode="inter_word"
+                android:textColor="@color/redtext"
+                android:textSize="12sp"
+                android:visibility="gone" />
+            <Button
+                android:id="@+id/btnDelete"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="15dp"
+                android:layout_marginHorizontal="15dp"
+                android:background="@drawable/blue_button_icon"
+                android:fontFamily="@font/sharpsans_bold"
+                android:minHeight="70dp"
+                android:letterSpacing="0.05"
+                android:paddingHorizontal="35dp"
+                android:shadowColor="#80FFFFFF"
+                android:shadowDx="0.0"
+                android:shadowDy="0.0"
+                android:shadowRadius="10"
+                android:text="DELETE"
+                android:textColor="@color/white"
+                android:textSize="16dp"
+                app:backgroundTint="@null" />
+        </LinearLayout>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:gravity="center_horizontal|bottom">
         <ImageView
             android:id="@+id/imageView"

@@ -36,11 +36,293 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <RelativeLayout
+        android:id="@+id/usernameContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/txtOptionsTitle">
+
+        <!--LABEL FOR GOLD/LEVEL 3-->
+        <LinearLayout
+            android:id="@+id/goldUser"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:orientation="horizontal"
+            android:layout_marginTop="15dp"
+            android:layout_marginLeft="-20dp"
+            android:gravity="center"
+            android:visibility="visible">
+            <ImageView
+                android:id="@+id/imgBadgeGold"
+                android:layout_width="105dp"
+                android:layout_height="wrap_content"
+                android:scaleType="centerInside"
+                app:srcCompat="@drawable/badge_gold" />
+            <TextView
+                android:id="@+id/txtUsernameGold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/sharpsans_bold"
+                android:text="Username"
+                android:textAlignment="center"
+                android:textColor="@color/goldtext"
+                android:shadowColor="#99fee58f"
+                android:shadowDx="0.0"
+                android:shadowDy="0.0"
+                android:shadowRadius="20"
+                android:textSize="24dp"
+                android:paddingHorizontal="5dp"/>
+        </LinearLayout>
+
+        <!--LABEL FOR SILVER/LEVEL 2-->
+        <LinearLayout
+            android:id="@+id/silverUser"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:orientation="horizontal"
+            android:layout_marginTop="15dp"
+            android:layout_marginLeft="-20dp"
+            android:gravity="center"
+            android:visibility="gone">
+            <ImageView
+                android:id="@+id/imgBadgeSilver"
+                android:layout_width="105dp"
+                android:layout_height="wrap_content"
+                android:scaleType="centerInside"
+                app:srcCompat="@drawable/badge_silver" />
+            <TextView
+                android:id="@+id/txtUsernameSilver"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/sharpsans_bold"
+                android:text="Username"
+                android:textAlignment="center"
+                android:textColor="@color/silvertext"
+                android:shadowColor="#99ffffff"
+                android:shadowDx="0.0"
+                android:shadowDy="0.0"
+                android:shadowRadius="20"
+                android:textSize="24dp"
+                android:paddingHorizontal="5dp"/>
+        </LinearLayout>
+
+        <!--LABEL FOR SILVER/LEVEL 1-->
+        <LinearLayout
+            android:id="@+id/bronzeUser"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:orientation="horizontal"
+            android:layout_marginTop="15dp"
+            android:layout_marginLeft="-20dp"
+            android:gravity="center"
+            android:visibility="gone">
+            <ImageView
+                android:id="@+id/imgBadgeBronze"
+                android:layout_width="105dp"
+                android:layout_height="wrap_content"
+                android:scaleType="centerInside"
+                app:srcCompat="@drawable/badge_bronze" />
+            <TextView
+                android:id="@+id/txtUsernameBronze"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/sharpsans_bold"
+                android:text="Username"
+                android:textAlignment="center"
+                android:textColor="@color/bronzetext"
+                android:shadowColor="#99ffa94c"
+                android:shadowDx="0.0"
+                android:shadowDy="0.0"
+                android:shadowRadius="20"
+                android:textSize="24dp"
+                android:paddingHorizontal="5dp"/>
+        </LinearLayout>
+
+
+        <!--LABEL FOR SILVER/LEVEL 0-->
+        <LinearLayout
+            android:id="@+id/ironUser"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:orientation="horizontal"
+            android:layout_marginTop="15dp"
+            android:layout_marginLeft="-20dp"
+            android:gravity="center"
+            android:visibility="gone">
+            <ImageView
+                android:id="@+id/imgBadgeIron"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:scaleType="centerInside"
+                app:srcCompat="@drawable/badge_iron" />
+            <TextView
+                android:id="@+id/txtUsernameIron"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/sharpsans_bold"
+                android:text="Username"
+                android:textAlignment="center"
+                android:textColor="@color/irontext"
+                android:shadowColor="#99bdbdbd"
+                android:shadowDx="0.0"
+                android:shadowDy="0.0"
+                android:shadowRadius="20"
+                android:textSize="24dp"
+                android:paddingHorizontal="5dp"/>
+        </LinearLayout>
+    </RelativeLayout>
+
+    <!--OPTIONS-->
+    <LinearLayout
+        android:id="@+id/optionsContainer"
+        android:layout_width="match_parent"
+        android:layout_height="380dp"
+        android:layout_marginHorizontal="30dp"
+        android:background="@drawable/blur_bg"
+        app:layout_constraintTop_toBottomOf="@id/usernameContainer"
+        tools:layout_editor_absoluteX="20dp"
+        android:layout_marginTop="10dp"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <!--BG MUSIC-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="5dp">
+            <TextView
+                android:id="@+id/txtBGMusicLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/sharpsans_bold"
+                android:textAlignment="viewStart"
+                android:paddingHorizontal="15dp"
+                android:paddingVertical="14dp"
+                android:text="Background Music"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:layout_marginLeft="4dp"
+                android:layout_alignParentLeft="true"/>
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/switchBGMusic"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:thumb="@drawable/switch_thumb"
+                app:track="@drawable/switch_track"
+                app:thumbTint="@null"
+                app:trackTint="@null"
+                android:checked="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="20dp">
+            </androidx.appcompat.widget.SwitchCompat>
+        </LinearLayout>
+
+        <!--Email Address-->
+        <LinearLayout
+            android:id="@+id/emailAddressContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="10dp">
+            <TextView
+                android:id="@+id/txtEmailAddressLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/sharpsans_bold"
+                android:textAlignment="viewStart"
+                android:paddingHorizontal="15dp"
+                android:paddingVertical="3dp"
+                android:text="Email Address"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:layout_marginLeft="4dp"
+                android:layout_alignParentLeft="true"/>
+            <TextView
+                android:id="@+id/txtEmailAddress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/sharpsans"
+                android:textAlignment="viewStart"
+                android:paddingHorizontal="15dp"
+                android:text="emailaddress@gmail.com"
+                android:textColor="#FFFFFF"
+                android:textSize="16.5sp"
+                android:layout_marginLeft="4dp"
+                android:layout_alignParentLeft="true"/>
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnEditUserInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginVertical="4dp"
+            android:layout_marginHorizontal="20dp"
+            android:background="@drawable/blue_button_icon"
+            android:fontFamily="@font/sharpsans_bold"
+            android:minHeight="70dp"
+            android:letterSpacing="0.05"
+            android:paddingHorizontal="35dp"
+            android:shadowColor="#80FFFFFF"
+            android:shadowDx="0.0"
+            android:shadowDy="0.0"
+            android:shadowRadius="10"
+            android:text="EDIT USER INFORMATION"
+            android:textColor="@color/white"
+            android:textSize="16dp"
+            app:backgroundTint="@null" />
+
+        <Button
+            android:id="@+id/btnLogout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginVertical="4dp"
+            android:layout_marginHorizontal="20dp"
+            android:background="@drawable/blue_button_icon"
+            android:fontFamily="@font/sharpsans_bold"
+            android:minHeight="70dp"
+            android:letterSpacing="0.05"
+            android:paddingHorizontal="35dp"
+            android:shadowColor="#80FFFFFF"
+            android:shadowDx="0.0"
+            android:shadowDy="0.0"
+            android:shadowRadius="10"
+            android:text="LOGOUT"
+            android:textColor="@color/white"
+            android:textSize="16dp"
+            app:backgroundTint="@null" />
+
+        <Button
+            android:id="@+id/btnDeleteAccount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginVertical="4dp"
+            android:layout_marginHorizontal="20dp"
+            android:background="@drawable/blue_button_icon"
+            android:fontFamily="@font/sharpsans_bold"
+            android:minHeight="70dp"
+            android:letterSpacing="0.05"
+            android:paddingHorizontal="35dp"
+            android:shadowColor="#80FFFFFF"
+            android:shadowDx="0.0"
+            android:shadowDy="0.0"
+            android:shadowRadius="10"
+            android:text="DELETE ACCOUNT"
+            android:textColor="@color/white"
+            android:textSize="16dp"
+            app:backgroundTint="@null" />
+
+    </LinearLayout>
+
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center_horizontal|bottom">
         <ImageView
-            android:id="@+id/imageView"
+            android:id="@+id/imgMoon"
             android:layout_width="wrap_content"
             android:layout_height="85dp"
             app:srcCompat="@drawable/moon_bottom"

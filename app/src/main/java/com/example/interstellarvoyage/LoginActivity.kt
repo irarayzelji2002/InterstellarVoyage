@@ -3,6 +3,8 @@ package com.example.interstellarvoyage
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
+import android.widget.EditText
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.FirebaseApp
 import com.google.firebase.firestore.FirebaseFirestore
@@ -12,21 +14,35 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        var btnLogin : Button = findViewById(R.id.btnLogin)
         var btnTestDatabaseFunctions : Button = findViewById(R.id.btnTestDatabaseFunctions)
         var btnTestGameFunctions : Button = findViewById(R.id.btnTestGameFunctions)
+
+        var btnLogin : Button = findViewById(R.id.btnLogin)
+        var btnRegAccount : TextView = findViewById(R.id.btnRegAccount)
+        var btnForgotPassword : TextView = findViewById(R.id.btnForgotPassword)
+
+        val editTextEmailAddress = findViewById<EditText>(R.id.editTextEmailAddress)
+        val editTextPassword = findViewById<EditText>(R.id.editTextPassword)
+        val loginErr = findViewById<TextView>(R.id.loginErr)
 
         FirebaseApp.initializeApp(this)
         val db = FirebaseFirestore.getInstance()
 
         btnLogin.setOnClickListener {
-            DatabaseFunctions.login(this, "irarayzelji@gmail.com", "irarayzelji")
-            // Trial
-            /*DatabaseFunctions.login(this, "irarayzelji@gmail.com", "irarayzelji2002")
-            DatabaseFunctions.login(this, "irarayzelji@gmail.com", "irarayzelji2002!")
-            DatabaseFunctions.login(this, "irarayzel.ji.cics@ust.edu.ph", "irarayzelji")
-            DatabaseFunctions.login(this, "irarayzel.ji.cics@ust.edu.ph", "irarayzelji2002")
-            DatabaseFunctions.login(this, "irarayzel.ji.cics@ust.edu.ph", "irarayzelji2002!")*/
+            val email = editTextEmailAddress.text.toString()
+            val password = editTextPassword.text.toString()
+            DatabaseFunctions.login(this, email, password)
+        }
+
+        btnRegAccount.setOnClickListener{
+            startActivity(Intent(this, RegistrationActivity::class.java))
+        }
+
+        btnForgotPassword.setOnClickListener {
+            DatabaseFunctions.forgotPassword(this)
+            var dialogFragment = ForgotPasswordActivity()
+            dialogFragment.setCancelable(false)
+            dialogFragment.show(supportFragmentManager, "Forgot Password Dialog")
         }
 
         btnTestDatabaseFunctions.setOnClickListener{

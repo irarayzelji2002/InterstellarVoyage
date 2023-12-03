@@ -261,7 +261,7 @@ object DatabaseFunctions {
         }
     }
 
-    fun changeEmailAdd(context: Context, oldemail: String, email: String, password: String,) {
+    fun changeEmailAdd(context: Context, email: String, password: String,) {
         val user = FirebaseAuth.getInstance().currentUser
         Log.i("test","outside if")
         if (user != null) {
@@ -274,7 +274,7 @@ object DatabaseFunctions {
                         user.sendEmailVerification()
                             .addOnCompleteListener { emailVerificationTask ->
                                 if (emailVerificationTask.isSuccessful) {
-                                    Toast.makeText(context, "Verification email sent to $oldemail", Toast.LENGTH_LONG).show()
+                                    Toast.makeText(context, "Verification email sent to ${user.email} and $email", Toast.LENGTH_LONG).show()
 
                                     val userDocumentRef = db.collection("users").document(user.uid)
                                     userDocumentRef.get().addOnSuccessListener { documentSnapshot ->
