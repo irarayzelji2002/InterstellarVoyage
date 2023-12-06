@@ -161,4 +161,16 @@
         app:layout_constraintTop_toBottomOf="@+id/btnCalculateTotalTimeCompleted"
         app:layout_constraintVertical_bias="0.14" />
 
+    <Button
+        android:id="@+id/btnLogin"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:text="Login"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.303"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnChangeUsername"
+        app:layout_constraintVertical_bias="0.237" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -83,7 +83,7 @@ object DatabaseFunctions {
                                 val editor = userPref.edit()
                                 editor.putBoolean("isLoggedIn", true)
                                 editor.apply()
-                                context.startActivity(Intent(context, TestDatabaseActivity::class.java))
+                                context.startActivity(Intent(context, HomepageActivity::class.java))
                             } else {
                                 Log.d("FirestoreData", "No such document")
                             }

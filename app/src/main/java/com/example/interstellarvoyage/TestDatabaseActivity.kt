@@ -16,6 +16,7 @@ class TestDatabaseActivity : AppCompatActivity() {
         setContentView(R.layout.activity_test_database)
 
         var btnRegAccount : Button = findViewById(R.id.btnRegAccount)
+        var btnLogin : Button = findViewById(R.id.btnLogin)
         var btnAccess : Button = findViewById(R.id.btnAccess)
         var btnChangeEmailAdd : Button = findViewById(R.id.btnChangeEmailAdd)
         var btnDeleteAccount : Button = findViewById(R.id.btnDeleteAccount)
@@ -34,6 +35,10 @@ class TestDatabaseActivity : AppCompatActivity() {
 
         btnRegAccount.setOnClickListener {
             DatabaseFunctions.regAccount(this, "exampleUser", "irarayzel.ji.cics@ust.edu.ph", "irarayzelji")
+        }
+
+        btnLogin.setOnClickListener {
+            DatabaseFunctions.login(this, "irarayzel.ji.cics@ust.edu.ph", "irarayzelji")
         }
 
         btnAccess.setOnClickListener{

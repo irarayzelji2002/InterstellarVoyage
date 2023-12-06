@@ -102,33 +102,33 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback {
         // LEVEL 0; 500 clicks (100/sub mission); Earth’s Great Dilemma
         btnLevel0Clicker.setOnClickListener(object : View.OnClickListener {
             override fun onClick(view: View) {
-                Toast.makeText(this@GameActivity,"Level 0 CLicker clicked", Toast.LENGTH_SHORT)
+                Toast.makeText(this@GameActivity,"Level 0 CLicker clicked", Toast.LENGTH_SHORT).show()
             }
         })
 
         // LEVEL 1; 1000 (200/sub mission); Search for New Habitat
-        btnLevel0Clicker.setOnClickListener(object : View.OnClickListener {
+        btnLevel1Clicker.setOnClickListener(object : View.OnClickListener {
             override fun onClick(view: View) {
-                Toast.makeText(this@GameActivity,"Level 1 CLicker clicked", Toast.LENGTH_SHORT)
+                Toast.makeText(this@GameActivity,"Level 1 CLicker clicked", Toast.LENGTH_SHORT).show()
             }
         })
 
         // LEVEL 2; 1000 (200/sub mission); Beacon in the Galaxy
-        btnLevel0Clicker.setOnClickListener(object : View.OnClickListener {
+        btnLevel2Clicker.setOnClickListener(object : View.OnClickListener {
             override fun onClick(view: View) {
-                Toast.makeText(this@GameActivity,"Level 2 CLicker clicked", Toast.LENGTH_SHORT)
+                Toast.makeText(this@GameActivity,"Level 2 CLicker clicked", Toast.LENGTH_SHORT).show()
             }
         })
 
         // LEVEL 3; 2000 (400/sub mission); The Cosmic Council
-        btnLevel0Clicker.setOnClickListener(object : View.OnClickListener {
+        btnLevel3Clicker.setOnClickListener(object : View.OnClickListener {
             override fun onClick(view: View) {
-                Toast.makeText(this@GameActivity,"Level 3 CLicker clicked", Toast.LENGTH_SHORT)
+                Toast.makeText(this@GameActivity,"Level 3 CLicker clicked", Toast.LENGTH_SHORT).show()
             }
         })
 
         btnStoryline.setOnClickListener {
-            Toast.makeText(this@GameActivity,"story button clicked", Toast.LENGTH_SHORT)
+            Toast.makeText(this@GameActivity,"story button clicked", Toast.LENGTH_SHORT).show()
         }
 
         btnOptions.setOnClickListener {
