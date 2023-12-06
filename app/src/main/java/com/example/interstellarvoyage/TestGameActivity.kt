@@ -14,5 +14,9 @@ class TestGameActivity : AppCompatActivity() {
 
         val lottieAnimationView: LottieAnimationView = findViewById(R.id.homepageBG)
     // Don't delete below this
+
+
+
+
     }
 }

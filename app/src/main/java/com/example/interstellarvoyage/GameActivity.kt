@@ -7,6 +7,7 @@ import android.graphics.drawable.BitmapDrawable
 import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
@@ -24,9 +25,31 @@ import com.bumptech.glide.request.RequestOptions
 class GameActivity : AppCompatActivity(), MusicPlayerCallback {
     private var mediaPlayer: MediaPlayer? = null
 
+    var Clicks: Int = 0
+    var ClicksperSecond: Float = 0.0F
+
+
+    var MissionReq: Int = 0
+    var TotalMissionClicks: Int = 0;
+
+    var Multiplier: Int = 2;
+
+    var startTime = 0.0f
+
+    private var lastClickTime: Long = 0
+    private var clicksInCurrentSecond: Int = 0
+
+    private var countdownTimer: CountDownTimer? = null
+    private val countdownDuration = 500 // Change this to the desired number of clicks
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game)
+
+
+
+
 
         // Click related
         // hide levelXGraphics if not in the level (e.g. level0Graphics.visibility = View.GONE/VISIBLE)
@@ -48,9 +71,15 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback {
         // Clicks Number and Time Duration
         var txtClicks : TextView = findViewById(R.id.txtClicks)
         var txtTime : TextView = findViewById(R.id.txtTime)
+        var txtCPS : TextView = findViewById(R.id.txtCPS)
 
         // Options Button
         var btnOptions : ImageButton = findViewById(R.id.btnOptions)
+
+
+
+
+
 
         // Populate activity info from database
         DatabaseFunctions.accessUserDocument(this) { userDocument ->
@@ -99,29 +128,101 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback {
             }
         }
 
+        //Timer
+       fun startCountdownTimer() {
+            countdownTimer = object : CountDownTimer(600000L, 1000L) {
+                override fun onTick(millisUntilFinished: Long) {
+                    // Update the timer display on each tick
+                    val secondsRemaining = millisUntilFinished / 1000
+                    val minutes = secondsRemaining / 60
+                    val seconds = secondsRemaining % 60
+                    txtTime.text = String.format("%02d:%02d", minutes, seconds)
+                }
+
+                override fun onFinish() {
+                    // Countdown is complete, update UI accordingly
+                    txtTime.text = "Countdown Complete"
+                }
+            }
+            countdownTimer?.start()
+        }
+
+        fun stopCountdownTimer() {
+            countdownTimer?.cancel()
+        }
+
+        //Clicks Per Second.
+        fun calculateCPS() {
+            val currentTimeMillis = System.currentTimeMillis()
+
+            // Check if one second has passed since the last click
+            if (currentTimeMillis - lastClickTime >= 1000) {
+                // Calculate CPS
+                ClicksperSecond = clicksInCurrentSecond.toFloat()
+                txtCPS.text = String.format("%.2f", ClicksperSecond)
+
+                // Reset counters for the next second
+                clicksInCurrentSecond = 0
+                lastClickTime = currentTimeMillis
+            } else {
+                // Increment click count within the current second
+                clicksInCurrentSecond++
+            }
+        }
+
         // LEVEL 0; 500 clicks (100/sub mission); Earth’s Great Dilemma
         btnLevel0Clicker.setOnClickListener(object : View.OnClickListener {
+
             override fun onClick(view: View) {
-                Toast.makeText(this@GameActivity,"Level 0 CLicker clicked", Toast.LENGTH_SHORT)
+                //LEVEL MISSION
+                TotalMissionClicks++
+                if (TotalMissionClicks == 500)
+                {
+                    //next mission
+                    stopCountdownTimer() // Stop the countdown timer when the activity is destroyed
+                    // DatabaseFunctions.changeCurrentMission(this@GameActivity,  )
+                }
+                if (TotalMissionClicks == 1) {
+                    startCountdownTimer()
+                }
+
+                //CLICKS PER SECOND
+
+                // --SUB MISSION--
+                MissionReq = 100;
+
+                //PerSubMission
+                if (Clicks == MissionReq){
+                    //Sub Mission = Complete
+                    Clicks = 0;
+                }
+                //Clicks
+                Clicks++;
+                txtClicks.text = Clicks.toString();
+                calculateCPS()
+
+                Toast.makeText(this@GameActivity,"Level 0 CLicker clicked", Toast.LENGTH_SHORT).show();
             }
         })
 
         // LEVEL 1; 1000 (200/sub mission); Search for New Habitat
-        btnLevel0Clicker.setOnClickListener(object : View.OnClickListener {
+        btnLevel1Clicker.setOnClickListener(object : View.OnClickListener {
             override fun onClick(view: View) {
+    
+
                 Toast.makeText(this@GameActivity,"Level 1 CLicker clicked", Toast.LENGTH_SHORT)
             }
         })
 
         // LEVEL 2; 1000 (200/sub mission); Beacon in the Galaxy
-        btnLevel0Clicker.setOnClickListener(object : View.OnClickListener {
+        btnLevel2Clicker.setOnClickListener(object : View.OnClickListener {
             override fun onClick(view: View) {
                 Toast.makeText(this@GameActivity,"Level 2 CLicker clicked", Toast.LENGTH_SHORT)
             }
         })
 
         // LEVEL 3; 2000 (400/sub mission); The Cosmic Council
-        btnLevel0Clicker.setOnClickListener(object : View.OnClickListener {
+        btnLevel3Clicker.setOnClickListener(object : View.OnClickListener {
             override fun onClick(view: View) {
                 Toast.makeText(this@GameActivity,"Level 3 CLicker clicked", Toast.LENGTH_SHORT)
             }
@@ -140,7 +241,11 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback {
     }
 
     override fun onDestroy() {
+
+
         super.onDestroy()
+
+
         mediaPlayer?.release()
     }
 
@@ -197,4 +302,7 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback {
             }
         }
     }
+
+
+
 }

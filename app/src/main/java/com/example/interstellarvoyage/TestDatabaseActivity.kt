@@ -33,7 +33,9 @@ class TestDatabaseActivity : AppCompatActivity() {
         val db = FirebaseFirestore.getInstance()
 
         btnRegAccount.setOnClickListener {
-            DatabaseFunctions.regAccount(this, "exampleUser", "irarayzel.ji.cics@ust.edu.ph", "irarayzelji")
+
+
+            DatabaseFunctions.regAccount(this, "kiel", "123", "123")
         }
 
         btnAccess.setOnClickListener{
