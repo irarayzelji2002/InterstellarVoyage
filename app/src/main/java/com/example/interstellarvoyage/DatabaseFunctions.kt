@@ -858,6 +858,58 @@ object DatabaseFunctions {
         } else {
             Toast.makeText(context, "User not found.", Toast.LENGTH_SHORT).show()
         }
+
+        fun changeUsername(context: Context, newUsername: String) {
+            val user = FirebaseAuth.getInstance().currentUser
+
+            if (user != null) {
+                val userDocumentRef = db.collection("users").document(user.uid)
+
+                checkUsernameUnique(newUsername) { isUnique ->
+                    if (isUnique) {
+                        userDocumentRef.update("userDetails.username", newUsername)
+                            .addOnSuccessListener {
+                                Toast.makeText(context, "Username updated successfully.", Toast.LENGTH_SHORT).show()
+                            }
+                            .addOnFailureListener { e ->
+                                Log.e("EditUsername", "Error updating username", e)
+                                Toast.makeText(context, "Failed to update username.", Toast.LENGTH_SHORT).show()
+                            }
+                    } else {
+                        Toast.makeText(context, "Username is not unique.", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } else {
+                Toast.makeText(context, "User not found.", Toast.LENGTH_SHORT).show()
+            }
+
+
+
+        }
+
     }
+
+    fun changeCurrentMission(context: Context, mission : String) {
+        val user = FirebaseAuth.getInstance().currentUser
+
+        if (user != null) {
+            val userDocumentRef = db.collection("users").document(user.uid)
+
+                    userDocumentRef.update("currentMission", mission)
+                        .addOnSuccessListener {
+                            Toast.makeText(context, "Mission updated successfully.", Toast.LENGTH_SHORT).show()
+                        }
+                        .addOnFailureListener { e ->
+                            Log.e("EditUsername", "Error updating Mission", e)
+                            Toast.makeText(context, "Failed to update Mission.", Toast.LENGTH_SHORT).show()
+                        }
+        }
+
+        else
+        {
+            Toast.makeText(context, "User not found.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     // Don't delete below this
 }
