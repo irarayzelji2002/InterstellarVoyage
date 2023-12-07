@@ -37,6 +37,7 @@ object GameFunctions {
         return currentMission
     }
 
+
     fun getNextCurrentMissionAfterLevel(currentMission: String): String? { //0.1 -> 0.2
         val parts = currentMission.split(".") //split string
         if (parts.size == 2) {
