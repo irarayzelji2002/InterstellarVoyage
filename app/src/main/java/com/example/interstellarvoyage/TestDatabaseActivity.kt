@@ -90,11 +90,11 @@ class TestDatabaseActivity : AppCompatActivity() {
         }
 
         btnLevelCompleted.setOnClickListener {
-            DatabaseFunctions.levelCompleted(this, 2, "2.0", 300L, 4000.65)
+            DatabaseFunctions.levelCompleted(this, 2, "2.0", 0.00,300L, 4000.65)
         }
 
         btnSubMissionCompleted.setOnClickListener {
-            DatabaseFunctions.subMissionCompleted(this, "2.1", 600L)
+            DatabaseFunctions.subMissionCompleted(this, "2.1", 10.00,600L)
         }
 
         btnAccessMissions.setOnClickListener {

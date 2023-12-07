@@ -35,14 +35,9 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback {
     private var countdownTimer: CountDownTimer? = null
     private val countdownDuration = 500 // Change this to the desired number of clicks
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game)
-
-
-
-
 
         // Click related
         // hide levelXGraphics if not in the level (e.g. level0Graphics.visibility = View.GONE/VISIBLE)
@@ -69,11 +64,6 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback {
         // Options Button
         var btnOptions : ImageButton = findViewById(R.id.btnOptions)
 
-
-
-
-
-
         // Populate activity info from database
         DatabaseFunctions.accessUserDocument(this) { userDocument ->
             if (userDocument != null) {
@@ -82,8 +72,10 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback {
                 val dbCurrentLevel: Long? = userDocument.currentLevel
                 val currentLevel: Int = dbCurrentLevel?.toInt() ?: 0
                 changeMusic(currentLevel)
-                // Store Click to local variable
-                val dBsecondsRemaining  = userDocument.timeCompletedForLevels
+
+                // Store Click & Duration to local variable
+                val dBsecondsRemaining  = userDocument.currentDuration
+                secondsRemaining = dBsecondsRemaining?.toInt()?: 0
                 val dbNumofClicks = userDocument.numberOfClicks
                 Clicks = dbNumofClicks?.toInt()?: 0
 
@@ -126,7 +118,7 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback {
         }
 
         //Timer
-       fun startCountdownTimer() {
+        fun startCountdownTimer() {
             countdownTimer = object : CountDownTimer(600000L, 1000L) {
                 override fun onTick(millisUntilFinished: Long) {
                     // Update the timer display on each tick
@@ -154,7 +146,6 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback {
 
             // Check if one second has passed since the last click
             if (currentTimeMillis - lastClickTime >= 1000) {
-
                 // Calculate CPS
                 ClicksperSecond = clicksInCurrentSecond.toFloat()
                 txtCPS.text = String.format("%.2f", ClicksperSecond)
@@ -165,26 +156,12 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback {
             } else {
                 // Increment click count within the current second
                 clicksInCurrentSecond++
-
-
-
             }
         }
 
-
-
         // LEVEL 0; 500 clicks (100/sub mission); Earth’s Great Dilemma
         btnLevel0Clicker.setOnClickListener(object : View.OnClickListener {
-
             override fun onClick(view: View) {
-
-                //Clicks
-                DatabaseFunctions.accessUserDocument(this@GameActivity) { userDocument ->
-                    if (userDocument != null) {
-
-
-                    }}
-
                 Clicks +=5;
                 txtClicks.text = Clicks.toString();
 
@@ -206,9 +183,6 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback {
                             //Current level
                             val dbCurrentLevel: Long? = userDocument.currentLevel
                             val currentLevel: Int = dbCurrentLevel?.toInt() ?: 0
-
-
-
                             val currentMission = userDocument.currentMission ?: "0.0"
                             var newCurMissionAfterLevel: String? =
                                 getNextCurrentMissionAfterLevel(currentMission)
@@ -219,6 +193,7 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback {
                                     this@GameActivity,
                                     newLevel.toLong(),
                                     newCurMissionAfterLevel,
+                                    0.00,
                                     TotalMissionClicks.toLong(),
                                     secondsRemaining.toDouble()
                                 )
@@ -230,11 +205,8 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback {
                                             "Duration: " + secondsRemaining.toString(),
                                             Toast.LENGTH_LONG).show();
                             }
-
-
                         }
                     }
-                    // DatabaseFunctions.changeCurrentMission(this@GameActivity,  )
                 }
                 if (TotalMissionClicks == 1) {
                     startCountdownTimer()
@@ -244,35 +216,24 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback {
 
                 //PerSubMission
                 if (Clicks % MissionReq == 0 && Clicks < 500) {
-
                       //Sub Mission = Complete
-                      DatabaseFunctions.accessUserDocument(this@GameActivity){
-                              userDocument ->
+                      DatabaseFunctions.accessUserDocument(this@GameActivity){ userDocument ->
                           if (userDocument != null){
                               val currentMission = userDocument.currentMission?: "0.0"
                               var newCurMission: String? = GameFunctions.getNextCurrentMission(currentMission)
                               if (newCurMission != null) {
-                                  subMissionCompleted(this@GameActivity, newCurMission, TotalMissionClicks.toLong())
+                                  subMissionCompleted(this@GameActivity, newCurMission, secondsRemaining.toDouble(), TotalMissionClicks.toLong())
                                   Toast.makeText(this@GameActivity, "Current Mission: " + newCurMission + " TotalMissionClicks: " + TotalMissionClicks, Toast.LENGTH_SHORT).show();
                               }
-
-
                       }
-
                     }
-
-
                 }
-
-
             }
         })
 
         // LEVEL 1; 1000 (200/sub mission); Search for New Habitat
         btnLevel1Clicker.setOnClickListener(object : View.OnClickListener {
             override fun onClick(view: View) {
-
-
                 Toast.makeText(this@GameActivity,"Level 1 CLicker clicked", Toast.LENGTH_SHORT)
             }
         })
@@ -304,11 +265,7 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback {
     }
 
     override fun onDestroy() {
-
-
         super.onDestroy()
-
-
         mediaPlayer?.release()
     }
 
@@ -365,7 +322,5 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback {
             }
         }
     }
-
-
-
+    // Don't delete below this
 }

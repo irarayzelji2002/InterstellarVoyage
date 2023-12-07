@@ -17,6 +17,7 @@ import java.util.concurrent.CompletableFuture
 data class UserDocument(
     val currentLevel: Long?,
     val currentMission: String?,
+    val currentDuration: Double?,
     val numberOfClicks: Long?,
     val totalTimeCompleted: Double?,
     val userDetails: UserDetails?,
@@ -201,7 +202,7 @@ object DatabaseFunctions {
                         // DocumentSnapshot data
                         val currentLevel = document.getLong("currentLevel")
                         val currentMission = document.getString("currentMission")
-                        val currentDuration = document.getString("currentDuration")
+                        val currentDuration = document.getDouble("currentDuration")
                         val numberOfClicks = document.getLong("numberOfClicks")
                         val totalTimeCompleted = document.getDouble("totalTimeCompleted")
 
@@ -243,7 +244,7 @@ object DatabaseFunctions {
                         }
 
                         val userDocument =  UserDocument(
-                            currentLevel, currentMission, numberOfClicks, totalTimeCompleted,
+                            currentLevel, currentMission, currentDuration, numberOfClicks, totalTimeCompleted,
                             UserDetails(username, email, emailChangeFlag),
                             TimeCompletedForLevels(level0Time, level1Time, level2Time, level3Time)
                         )
