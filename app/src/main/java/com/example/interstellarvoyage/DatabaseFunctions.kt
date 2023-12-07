@@ -134,7 +134,8 @@ object DatabaseFunctions {
                                             // User document does not exist, create it
                                             val userData = hashMapOf(
                                                 "currentLevel" to 0,
-                                                "currentMission" to "0.1",
+                                                "currentMission" to "0.0",
+                                                "currentDuration" to 0.0,
                                                 "numberOfClicks" to 0L,
                                                 "totalTimeCompleted" to 0.0,
                                                 "userDetails" to hashMapOf(
@@ -200,6 +201,7 @@ object DatabaseFunctions {
                         // DocumentSnapshot data
                         val currentLevel = document.getLong("currentLevel")
                         val currentMission = document.getString("currentMission")
+                        val currentDuration = document.getString("currentDuration")
                         val numberOfClicks = document.getLong("numberOfClicks")
                         val totalTimeCompleted = document.getDouble("totalTimeCompleted")
 
@@ -451,7 +453,7 @@ object DatabaseFunctions {
         }
     }
 
-    fun levelCompleted (context: Context, currentLevel: Long, currentMission: String, numberOfClicks: Long, timeCompletedForLevel: Double) {
+    fun levelCompleted (context: Context, currentLevel: Long, currentMission: String, currentDuration: Double, numberOfClicks: Long, timeCompletedForLevel: Double) {
         val user = FirebaseAuth.getInstance().currentUser
 
         if (user != null) {
@@ -463,6 +465,7 @@ object DatabaseFunctions {
                         val updatedData  = hashMapOf(
                             "currentLevel" to currentLevel,
                             "currentMission" to currentMission,
+                            "currentDuration" to currentDuration,
                             "numberOfClicks" to numberOfClicks,
                             "timeCompletedForLevels.level$currentLevel" to timeCompletedForLevel
                         )
@@ -490,7 +493,7 @@ object DatabaseFunctions {
         }
     }
 
-    fun subMissionCompleted(context: Context, currentMission: String, numberOfClicks: Long) {
+    fun subMissionCompleted(context: Context, currentMission: String, currentDuration: Double, numberOfClicks: Long) {
         val user = FirebaseAuth.getInstance().currentUser
 
         if (user != null) {
@@ -501,6 +504,7 @@ object DatabaseFunctions {
                         //new details of user
                         val updatedData  = hashMapOf(
                             "currentMission" to currentMission,
+                            "currentDuration" to currentDuration,
                             "numberOfClicks" to numberOfClicks
                         )
 
@@ -858,58 +862,6 @@ object DatabaseFunctions {
         } else {
             Toast.makeText(context, "User not found.", Toast.LENGTH_SHORT).show()
         }
-
-        fun changeUsername(context: Context, newUsername: String) {
-            val user = FirebaseAuth.getInstance().currentUser
-
-            if (user != null) {
-                val userDocumentRef = db.collection("users").document(user.uid)
-
-                checkUsernameUnique(newUsername) { isUnique ->
-                    if (isUnique) {
-                        userDocumentRef.update("userDetails.username", newUsername)
-                            .addOnSuccessListener {
-                                Toast.makeText(context, "Username updated successfully.", Toast.LENGTH_SHORT).show()
-                            }
-                            .addOnFailureListener { e ->
-                                Log.e("EditUsername", "Error updating username", e)
-                                Toast.makeText(context, "Failed to update username.", Toast.LENGTH_SHORT).show()
-                            }
-                    } else {
-                        Toast.makeText(context, "Username is not unique.", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            } else {
-                Toast.makeText(context, "User not found.", Toast.LENGTH_SHORT).show()
-            }
-
-
-
-        }
-
     }
-
-    fun changeCurrentMission(context: Context, mission : String) {
-        val user = FirebaseAuth.getInstance().currentUser
-
-        if (user != null) {
-            val userDocumentRef = db.collection("users").document(user.uid)
-
-                    userDocumentRef.update("currentMission", mission)
-                        .addOnSuccessListener {
-                            Toast.makeText(context, "Mission updated successfully.", Toast.LENGTH_SHORT).show()
-                        }
-                        .addOnFailureListener { e ->
-                            Log.e("EditUsername", "Error updating Mission", e)
-                            Toast.makeText(context, "Failed to update Mission.", Toast.LENGTH_SHORT).show()
-                        }
-        }
-
-        else
-        {
-            Toast.makeText(context, "User not found.", Toast.LENGTH_SHORT).show()
-        }
-    }
-
     // Don't delete below this
 }
