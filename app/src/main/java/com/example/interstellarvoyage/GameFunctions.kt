@@ -13,7 +13,6 @@ data class ChangeNalang(
 
 object GameFunctions {
     val db = FirebaseFirestore.getInstance()
-
     fun findNextLine(context: Context, currentMission: String): Line? {
         val nextMissionId = getNextMissionId(currentMission)
         return Storyline.lines.find { it.id == nextMissionId }
@@ -26,6 +25,29 @@ object GameFunctions {
             return "${parts[0]}.${incrementedLastPart}.1" //combine to string & get first storyline of the next sub mission
         }
         return currentMission
+    }
+
+    fun getNextCurrentMission(currentMission: String): String? { //0.1 -> 0.2
+        val parts = currentMission.split(".") //split string
+        if (parts.size == 2) {
+            val incrementedLastPart = (parts[1].toInt() + 1).toString() //increment the last digit
+            return "${parts[0]}.${incrementedLastPart}" //combine to string
+        }
+        return currentMission
+    }
+
+
+    fun getNextCurrentMissionAfterLevel(currentMission: String): String? { //0.1 -> 0.2
+        val parts = currentMission.split(".") //split string
+        if (parts.size == 2) {
+            val incrementedFirstPart = (parts[0].toInt() + 1).toString() //increment the first digit
+            return "${incrementedFirstPart}.0" //combine to string
+        }
+        return currentMission
+    }
+
+    fun getNextLevel(currentLevel: Int): Int? {
+        return currentLevel + 1
     }
 
     fun playMusic(context: Context) {

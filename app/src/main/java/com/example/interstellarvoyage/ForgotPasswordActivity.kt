@@ -1,6 +1,5 @@
 package com.example.interstellarvoyage
 
-import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -9,7 +8,6 @@ import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.Button
-import android.widget.ImageButton
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.DialogFragment
