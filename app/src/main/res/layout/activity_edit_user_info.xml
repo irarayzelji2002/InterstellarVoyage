@@ -136,7 +136,6 @@
                 android:paddingHorizontal="5dp"/>
         </LinearLayout>
 
-
         <!--LABEL FOR SILVER/LEVEL 0-->
         <LinearLayout
             android:id="@+id/ironUser"

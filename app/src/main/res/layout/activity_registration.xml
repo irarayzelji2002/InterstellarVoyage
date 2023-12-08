@@ -37,6 +37,10 @@
             android:text="REGISTRATION"
             android:textAlignment="center"
             android:textSize="30dp"
+            android:shadowColor="#0f0f28"
+            android:shadowDx="0.0"
+            android:shadowDy="0.0"
+            android:shadowRadius="20"
             android:layout_marginTop="-60dp"/>
 
         <!--EDIT USER INFO-->
@@ -108,35 +112,29 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:layout_marginTop="10dp">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
-                    <TextView
-                        android:id="@+id/txtEmailAddressLabel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/sharpsans_bold"
-                        android:textAlignment="viewStart"
-                        android:paddingVertical="3dp"
-                        android:text="Email Address"
-                        android:textColor="#FFFFFF"
-                        android:textSize="18sp"
-                        android:layout_alignParentLeft="true"/>
-                    <TextView
-                        android:id="@+id/emailAddressErr"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/sharpsans_medium"
-                        android:textAlignment="viewStart"
-                        android:paddingVertical="3dp"
-                        android:text="This field is required"
-                        android:textColor="@color/redtext"
-                        android:textSize="12sp"
-                        android:layout_marginLeft="10dp"
-                        android:layout_alignParentLeft="true"
-                        android:visibility="gone" />
-                </LinearLayout>
+                <TextView
+                    android:id="@+id/txtEmailAddressLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/sharpsans_bold"
+                    android:textAlignment="viewStart"
+                    android:paddingVertical="3dp"
+                    android:text="Email Address"
+                    android:textColor="#FFFFFF"
+                    android:textSize="18sp"
+                    android:layout_alignParentLeft="true"/>
+                <TextView
+                    android:id="@+id/emailAddressErr"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/sharpsans_medium"
+                    android:textAlignment="viewStart"
+                    android:paddingVertical="3dp"
+                    android:text="This field is required"
+                    android:textColor="@color/redtext"
+                    android:textSize="12sp"
+                    android:layout_alignParentLeft="true"
+                    android:visibility="gone" />
                 <EditText
                     android:id="@+id/editTextEmailAddress"
                     android:layout_width="match_parent"
@@ -150,41 +148,37 @@
                     android:textColor="@color/edttext"
                     android:paddingHorizontal="20dp" />
             </LinearLayout>
+
+            <!--PASSWORD-->
             <LinearLayout
                 android:id="@+id/paswordContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:layout_marginTop="10dp">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
-                    <TextView
-                        android:id="@+id/txtPasswordLabel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/sharpsans_bold"
-                        android:textAlignment="viewStart"
-                        android:paddingVertical="3dp"
-                        android:text="Password"
-                        android:textColor="#FFFFFF"
-                        android:textSize="18sp"
-                        android:layout_alignParentLeft="true"/>
-                    <TextView
-                        android:id="@+id/passwordErr"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/sharpsans_medium"
-                        android:textAlignment="viewStart"
-                        android:paddingVertical="3dp"
-                        android:text="This field is required"
-                        android:textColor="@color/redtext"
-                        android:textSize="12sp"
-                        android:layout_marginLeft="10dp"
-                        android:layout_alignParentLeft="true"
-                        android:visibility="gone" />
-                </LinearLayout>
+                <TextView
+                    android:id="@+id/txtPasswordLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/sharpsans_bold"
+                    android:textAlignment="viewStart"
+                    android:paddingVertical="3dp"
+                    android:text="Password"
+                    android:textColor="#FFFFFF"
+                    android:textSize="18sp"
+                    android:layout_alignParentLeft="true"/>
+                <TextView
+                    android:id="@+id/passwordErr"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/sharpsans_medium"
+                    android:textAlignment="viewStart"
+                    android:paddingVertical="3dp"
+                    android:text="This field is required"
+                    android:textColor="@color/redtext"
+                    android:textSize="12sp"
+                    android:layout_alignParentLeft="true"
+                    android:visibility="gone" />
                 <EditText
                     android:id="@+id/editTextPassword"
                     android:layout_width="match_parent"
@@ -198,6 +192,52 @@
                     android:textColor="@color/edttext"
                     android:paddingHorizontal="20dp" />
             </LinearLayout>
+
+            <!--CONFIRM PASSWORD-->
+            <LinearLayout
+                android:id="@+id/confirmPaswordContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="10dp">
+                <TextView
+                    android:id="@+id/txtConfirmPasswordLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/sharpsans_bold"
+                    android:textAlignment="viewStart"
+                    android:paddingVertical="3dp"
+                    android:text="Confirm Password"
+                    android:textColor="#FFFFFF"
+                    android:textSize="18sp"
+                    android:layout_alignParentLeft="true"/>
+                <TextView
+                    android:id="@+id/confirmPasswordErr"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/sharpsans_medium"
+                    android:textAlignment="viewStart"
+                    android:paddingVertical="3dp"
+                    android:text="This field is required"
+                    android:textColor="@color/redtext"
+                    android:textSize="12sp"
+                    android:layout_alignParentLeft="true"
+                    android:visibility="gone" />
+                <EditText
+                    android:id="@+id/editTextConfirmPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:ems="10"
+                    android:hint="Confirm Password"
+                    android:inputType="textPassword"
+                    android:background="@drawable/edt_bg"
+                    android:fontFamily="@font/sharpsans"
+                    android:textSize="16sp"
+                    android:textColor="@color/edttext"
+                    android:paddingHorizontal="20dp" />
+            </LinearLayout>
+
+            <!--ALL ERROR MESSAGE IF NEEDED-->
             <TextView
                 android:id="@+id/registerErr"
                 android:layout_width="match_parent"
@@ -231,6 +271,16 @@
                 android:textColor="@color/white"
                 android:textSize="16dp"
                 app:backgroundTint="@null" />
+            <TextView
+                android:id="@+id/btnLogin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/sharpsans_medium"
+                android:textAlignment="center"
+                android:paddingVertical="3dp"
+                android:text="Login to an Account"
+                android:textColor="@color/bluelink"
+                android:textSize="13sp" />
         </LinearLayout>
     </RelativeLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -34,13 +34,24 @@ class TestDatabaseActivity : AppCompatActivity() {
         val db = FirebaseFirestore.getInstance()
 
         btnRegAccount.setOnClickListener {
-
-
-            DatabaseFunctions.regAccount(this, "kiel", "123", "123")
+            DatabaseFunctions.regAccount(this, "kiel", "123", "123", "123") { errors ->
+                if(errors != null) {
+                    Log.d("Error", "Username: ${errors.usernameErr}")
+                    Log.d("Error", "Email Address: ${errors.emailAddressErr}")
+                    Log.d("Error", "Password: ${errors.passwordErr}")
+                    Log.d("Error", "Confirm Password: ${errors.confirmPasswordErr}")
+                }
+            }
         }
 
         btnLogin.setOnClickListener {
-            DatabaseFunctions.login(this, "irarayzel.ji.cics@ust.edu.ph", "irarayzelji")
+            DatabaseFunctions.login(this, "irarayzel.ji.cics@ust.edu.ph", "irarayzelji"){ errors ->
+                if(errors != null) {
+                    Log.d("Error", "Email Address: ${errors.emailAddressErr}")
+                    Log.d("Error", "Password: ${errors.passwordErr}")
+                    Log.d("Error", "Login Error: ${errors.authenticateErr}")
+                }
+            }
         }
 
         btnAccess.setOnClickListener{

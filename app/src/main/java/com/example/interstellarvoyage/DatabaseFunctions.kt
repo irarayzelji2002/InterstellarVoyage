@@ -7,10 +7,14 @@ import android.content.Context.MODE_PRIVATE
 import android.content.Intent
 import android.util.Log
 import android.widget.Toast
+import androidx.fragment.app.FragmentManager
+import com.google.firebase.FirebaseNetworkException
+import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.firestore.FirebaseFirestore
 import java.util.concurrent.CompletableFuture
 
@@ -50,130 +54,368 @@ data class UserLeaderboard(
     val currentUserRankLevel: LeaderboardEntry?,
 )
 
+data class RegErr(
+    val usernameErr: String,
+    val emailAddressErr: String,
+    val passwordErr: String,
+    val confirmPasswordErr: String,
+    val registerErr: String
+)
+
+data class AuthenticateErr( //for login and delete account
+    val emailAddressErr: String,
+    val passwordErr: String,
+    val authenticateErr: String
+)
+
 object DatabaseFunctions {
     val db = FirebaseFirestore.getInstance()
 
-    fun login(context: Context, email: String, password: String) {
-        FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener { signInTask ->
-                if (signInTask.isSuccessful) {
-                    val user = FirebaseAuth.getInstance().currentUser
-                    if (user != null) {
-                        val userDocumentRef = db.collection("users").document(user.uid)
-                        userDocumentRef.get().addOnSuccessListener { documentSnapshot ->
-                            if (documentSnapshot.exists()) {
-                                val emailChangeFlag = documentSnapshot.getBoolean("userDetails.emailChangeFlag") ?: false
-                                Log.d("emailChangeFlag", emailChangeFlag.toString())
-                                if (emailChangeFlag) {
-                                    val userData = hashMapOf(
-                                        "userDetails.email" to email,
-                                        "userDetails.emailChangeFlag" to false
+    fun login(context: Context, email: String, password: String, callback: (AuthenticateErr?) -> Unit) {
+        var email = email
+        var password = password
+        var loginErr: AuthenticateErr? = null
+        var emailAddressErr = ""
+        var passwordErr = ""
+        var authenticateErr = ""
+        var errCount = 0
+
+        if(email == "" || email == null) {
+            emailAddressErr = "This field is required"
+            errCount++
+        }
+        if(password == "" || password == null) {
+            passwordErr = "This field is required"
+            errCount++
+        }
+
+        if(errCount == 0) {
+            FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener { signInTask ->
+                    if (signInTask.isSuccessful) {
+                        val user = FirebaseAuth.getInstance().currentUser
+                        if (user != null) {
+                            val userDocumentRef = db.collection("users").document(user.uid)
+                            userDocumentRef.get().addOnSuccessListener { documentSnapshot ->
+                                if (documentSnapshot.exists()) {
+                                    val emailChangeFlag = documentSnapshot.getBoolean("userDetails.emailChangeFlag") ?: false
+                                    Log.d("emailChangeFlag", emailChangeFlag.toString())
+                                    if (emailChangeFlag) {
+                                        val userData = hashMapOf(
+                                            "userDetails.email" to email,
+                                            "userDetails.emailChangeFlag" to false
+                                        )
+
+                                        val updatedDataMap: Map<String, Any> = userData
+
+                                        userDocumentRef.update(updatedDataMap)
+                                            .addOnSuccessListener {
+                                                Log.d("FirestoreData", "email change flag cleared and email updated")
+                                            }
+                                            .addOnFailureListener { e ->
+                                                Log.e("FirestoreData", "Error clearing email change flag and updating email: $e")
+                                            }
+                                    }
+                                    val userPref = context.getSharedPreferences("UserPrefs", MODE_PRIVATE)
+                                    val editor = userPref.edit()
+                                    editor.putBoolean("isLoggedIn", true)
+                                    editor.apply()
+                                    context.startActivity(Intent(context, HomepageActivity::class.java))
+                                } else {
+                                    Log.d("FirestoreData", "No such document")
+                                    authenticateErr = "Failed to get details. Please try again."
+                                    loginErr = AuthenticateErr(
+                                        emailAddressErr = emailAddressErr,
+                                        passwordErr = passwordErr,
+                                        authenticateErr = authenticateErr
                                     )
-
-                                    val updatedDataMap: Map<String, Any> = userData
-
-                                    userDocumentRef.update(updatedDataMap)
-                                        .addOnSuccessListener {
-                                            Log.d("FirestoreData", "email change flag cleared and email updated")
-                                        }
-                                        .addOnFailureListener { e ->
-                                            Log.e("FirestoreData", "Error clearing email change flag and updating email: $e")
-                                        }
+                                    if (loginErr != null) {
+                                        callback(loginErr)
+                                    } else {
+                                        callback(null)
+                                    }
                                 }
-                                val userPref = context.getSharedPreferences("UserPrefs", MODE_PRIVATE)
-                                val editor = userPref.edit()
-                                editor.putBoolean("isLoggedIn", true)
-                                editor.apply()
-                                context.startActivity(Intent(context, HomepageActivity::class.java))
+                            }
+                                .addOnFailureListener { exception ->
+                                    when (exception) {
+                                        is FirebaseAuthInvalidUserException -> { // User does not exist or has been disabled
+                                            Log.d("Invalid email or password.", "${exception?.message}")
+                                            //emailAddressErr = "User does not exists"
+                                            authenticateErr = "Invalid email or password."
+                                            loginErr = AuthenticateErr(
+                                                emailAddressErr = emailAddressErr,
+                                                passwordErr = passwordErr,
+                                                authenticateErr = authenticateErr
+                                            )
+                                            if (loginErr != null) {
+                                                callback(loginErr)
+                                            } else {
+                                                callback(null)
+                                            }
+                                        }
+                                        is FirebaseAuthInvalidCredentialsException -> { // Invalid password
+                                            Log.d("Invalid email or password.", "${exception?.message}")
+                                            //passwordErr = "Invalid password"
+                                            authenticateErr = "Invalid email or password."
+                                            loginErr = AuthenticateErr(
+                                                emailAddressErr = emailAddressErr,
+                                                passwordErr = passwordErr,
+                                                authenticateErr = authenticateErr
+                                            )
+                                            if (loginErr != null) {
+                                                callback(loginErr)
+                                            } else {
+                                                callback(null)
+                                            }
+                                        }
+                                        else -> { // General error
+                                            Log.d("login failed", "${exception?.message}")
+                                            authenticateErr = "Login failed. Please try again."
+                                            loginErr = AuthenticateErr(
+                                                emailAddressErr = emailAddressErr,
+                                                passwordErr = passwordErr,
+                                                authenticateErr = authenticateErr
+                                            )
+                                            if (loginErr != null) {
+                                                callback(loginErr)
+                                            } else {
+                                                callback(null)
+                                            }
+                                        }
+                                    }
+                                }
+                        } else {
+                            authenticateErr = "User not found. Please register."
+                            loginErr = AuthenticateErr(
+                                emailAddressErr = emailAddressErr,
+                                passwordErr = passwordErr,
+                                authenticateErr = authenticateErr
+                            )
+                            if (loginErr != null) {
+                                callback(loginErr)
                             } else {
-                                Log.d("FirestoreData", "No such document")
+                                callback(null)
                             }
                         }
-                            .addOnFailureListener { exception ->
-                                when (exception) {
-                                    is FirebaseAuthInvalidUserException -> { // User does not exist or has been disabled
-                                        Toast.makeText(context, "Invalid email or password.", Toast.LENGTH_LONG).show()
-                                    }
-                                    is FirebaseAuthInvalidCredentialsException -> { // Invalid password
-                                        Toast.makeText(context, "Invalid email or password.", Toast.LENGTH_LONG).show()
-                                    }
-                                    else -> { // General error
-                                        Toast.makeText(context, "Login failed. ${exception?.message}", Toast.LENGTH_LONG).show()
-                                        Log.d("login failed", "${exception?.message}")
-                                    }
-                                }
-                            }
+                    } else {
+                        authenticateErr = "Invalid email or password."
+                        loginErr = AuthenticateErr(
+                            emailAddressErr = emailAddressErr,
+                            passwordErr = passwordErr,
+                            authenticateErr = authenticateErr
+                        )
+                        if (loginErr != null) {
+                            callback(loginErr)
+                        } else {
+                            callback(null)
+                        }
                     }
-                } else {
-                    Toast.makeText(context, "Invalid fields.", Toast.LENGTH_LONG).show()
                 }
-            }
+        }
+        loginErr = AuthenticateErr(
+            emailAddressErr = emailAddressErr,
+            passwordErr = passwordErr,
+            authenticateErr = authenticateErr
+        )
+        if (loginErr != null) {
+            callback(loginErr)
+        } else {
+            callback(null)
+        }
     }
 
-    fun regAccount(context: Context, username: String, email: String, password: String) {
+    fun regAccount(context: Context, username: String, email: String, password: String, confirmPassword: String, callback: (RegErr?) -> Unit) {
         var username = username
         var email = email
         var password = password
+        var confirmPassword = confirmPassword
+        var regErr: RegErr? = null
+        var usernameErr = ""
+        var emailAddressErr = ""
+        var passwordErr = ""
+        var confirmPasswordErr = ""
+        var registerErr = ""
+        var errCount = 0
 
-        checkUsernameUnique(username) { isUnique ->
-            if (isUnique) {
-                FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
-                    .addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-                            val user = FirebaseAuth.getInstance().currentUser
-                            if (user != null) {
-                                val userDocumentRef = db.collection("users").document(user.uid)
+        if(username == "" || username == null) {
+            usernameErr = "This field is required"
+            errCount++
+        }
+        val emailRegex = "^[A-Za-z](.*)([@]{1})(.{1,})(\\.)(.{1,})"
+        if(email == "" || email == null) {
+            emailAddressErr = "This field is required"
+            errCount++
+        } else if (!email.matches(emailRegex.toRegex())) {
+            emailAddressErr = "Email address is not valid."
+            errCount++
+        }
+        if(password == "" || password == null) {
+            passwordErr = "This field is required"
+            errCount++
+        } else if(password.length < 8) {
+            passwordErr = "Password must have a minimum length of 8 characters."
+            errCount++
+        }
+        if(confirmPassword == "" || confirmPassword == null) {
+            confirmPasswordErr = "This field is required"
+            errCount++
+        } else if(confirmPassword != password) {
+            Log.d("Debug", "inside")
+            confirmPasswordErr = "Password does not match"
+            errCount++
+        }
 
-                                userDocumentRef.get().addOnCompleteListener { documentTask ->
-                                    if (documentTask.isSuccessful) {
-                                        val documentSnapshot = documentTask.result
+        if(errCount == 0) {
+            try{
+            checkUsernameUnique(username) { isUnique ->
+                if (isUnique) {
+                    FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
+                        .addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                val user = FirebaseAuth.getInstance().currentUser
+                                if (user != null) {
+                                    val userDocumentRef = db.collection("users").document(user.uid)
 
-                                        if (documentSnapshot != null && documentSnapshot.exists()) {
-                                            // User document already exists
-                                            Log.d(ContentValues.TAG, "User document already exists")
-                                        } else {
-                                            // User document does not exist, create it
-                                            val userData = hashMapOf(
-                                                "currentLevel" to 0,
-                                                "currentMission" to "0.0",
-                                                "currentDuration" to 0.0,
-                                                "numberOfClicks" to 0L,
-                                                "totalTimeCompleted" to 0.0,
-                                                "userDetails" to hashMapOf(
-                                                    "username" to username,
-                                                    "email" to email,
-                                                    "emailChangeFlag" to false
-                                                ),
-                                                "timeCompletedForLevels" to hashMapOf(
-                                                    "level0" to 0.0,
-                                                    "level1" to 0.0,
-                                                    "level2" to 0.0,
-                                                    "level3" to 0.0
+                                    userDocumentRef.get().addOnCompleteListener { documentTask ->
+                                        if (documentTask.isSuccessful) {
+                                            val documentSnapshot = documentTask.result
+
+                                            if (documentSnapshot != null && documentSnapshot.exists()) {
+                                                // User document already exists
+                                                Log.d(ContentValues.TAG, "User document already exists")
+                                            } else {
+                                                // User document does not exist, create it
+                                                val userData = hashMapOf(
+                                                    "currentLevel" to 0,
+                                                    "currentMission" to "0.0",
+                                                    "currentDuration" to 0.0,
+                                                    "numberOfClicks" to 0L,
+                                                    "totalTimeCompleted" to 0.0,
+                                                    "userDetails" to hashMapOf(
+                                                        "username" to username,
+                                                        "email" to email,
+                                                        "emailChangeFlag" to false
+                                                    ),
+                                                    "timeCompletedForLevels" to hashMapOf(
+                                                        "level0" to 0.0,
+                                                        "level1" to 0.0,
+                                                        "level2" to 0.0,
+                                                        "level3" to 0.0
+                                                    )
                                                 )
-                                            )
 
-                                            userDocumentRef.set(userData)
-                                                .addOnSuccessListener {
-                                                    Toast.makeText(context, "Account created, please log in.", Toast.LENGTH_LONG).show()
-                                                    context.startActivity(Intent(context, LoginActivity::class.java))
-                                                }
-                                                .addOnFailureListener { e ->
-                                                    Log.e(ContentValues.TAG, "Error adding user account.", e)
-                                                    Toast.makeText(context, "Registration failed, please try again.", Toast.LENGTH_LONG).show()
-                                                }
+                                                userDocumentRef.set(userData)
+                                                    .addOnSuccessListener {
+                                                        //Toast.makeText(context, "Account created, please log in.", Toast.LENGTH_LONG).show()
+                                                        context.startActivity(Intent(context, LoginActivity::class.java))
+                                                    }
+                                                    .addOnFailureListener { e ->
+                                                        Log.e(ContentValues.TAG, "Error adding user account.", e)
+                                                        registerErr = e.message ?: "Registration failed. Please try again."
+                                                        regErr = RegErr(
+                                                            usernameErr = usernameErr,
+                                                            emailAddressErr = emailAddressErr,
+                                                            passwordErr = passwordErr,
+                                                            confirmPasswordErr = confirmPasswordErr,
+                                                            registerErr = registerErr
+                                                        )
+                                                        if (regErr != null) {
+                                                            callback(regErr)
+                                                        } else {
+                                                            callback(null)
+                                                        }
+                                                    }
+                                            }
                                         }
                                     }
+                                } else {
+                                    val exception = task.exception
+                                    registerErr = exception?.message ?: "Registration failed. Please try again."
+                                    Log.e("account reg", exception.toString())
+                                    regErr = RegErr(
+                                        usernameErr = usernameErr,
+                                        emailAddressErr = emailAddressErr,
+                                        passwordErr = passwordErr,
+                                        confirmPasswordErr = confirmPasswordErr,
+                                        registerErr = registerErr
+                                    )
+                                    if (regErr != null) {
+                                        callback(regErr)
+                                    } else {
+                                        callback(null)
+                                    }
                                 }
-                            } else {
-                                val exception = task.exception
-                                Toast.makeText(context, "Registration failed.", Toast.LENGTH_LONG).show()
-                                Log.e("account reg", exception.toString())
                             }
                         }
+                        .addOnFailureListener { e ->
+                            try {
+                                throw e
+                            } catch (e: FirebaseAuthUserCollisionException) {
+                                emailAddressErr = "Email Address already exists"
+                            } catch (e: Exception) {
+                                Log.e("account reg", "Exception occurred: ${e.message}")
+                                registerErr = "Registration failed. Please try again."
+                            }
+                            regErr = RegErr(
+                                usernameErr = usernameErr,
+                                emailAddressErr = emailAddressErr,
+                                passwordErr = passwordErr,
+                                confirmPasswordErr = confirmPasswordErr,
+                                registerErr = registerErr
+                            )
+                            if (regErr != null) {
+                                callback(regErr)
+                            } else {
+                                callback(null)
+                            }
+                        }
+                } else {
+                    usernameErr = "Username is not unique"
+                    regErr = RegErr(
+                        usernameErr = usernameErr,
+                        emailAddressErr = emailAddressErr,
+                        passwordErr = passwordErr,
+                        confirmPasswordErr = confirmPasswordErr,
+                        registerErr = registerErr
+                    )
+                    if (regErr != null) {
+                        callback(regErr)
+                    } else {
+                        callback(null)
                     }
-            } else {
-                Toast.makeText(context, "Username is not unique.", Toast.LENGTH_LONG).show()
+                }
             }
+            } catch (e: Exception) {
+                Log.e("account reg", "Exception occurred: ${e.message}")
+                registerErr = "Registration failed. Please try again."
+
+                when (e) {
+                    is FirebaseAuthInvalidCredentialsException -> {
+                        registerErr = "Invalid fields. Please recheck."
+                    }
+                    is FirebaseAuthUserCollisionException -> {
+                        emailAddressErr = "Email Address already exists"
+                    }
+                    is FirebaseNetworkException -> {
+                        registerErr = "Please check your network connection."
+                    }
+                    is FirebaseTooManyRequestsException -> {
+                        registerErr = "Too many requests. please try again later."
+                    }
+                }
+            }
+        }
+        regErr = RegErr(
+            usernameErr = usernameErr,
+            emailAddressErr = emailAddressErr,
+            passwordErr = passwordErr,
+            confirmPasswordErr = confirmPasswordErr,
+            registerErr = registerErr
+        )
+        if (regErr != null) {
+            callback(regErr)
+        } else {
+            callback(null)
         }
     }
 
@@ -420,6 +662,85 @@ object DatabaseFunctions {
         }
     }
 
+    fun authenticateBeforeDelete(context: Context, email: String, password: String, supportFragmentManager: FragmentManager, fragmentTag: String, callback: (AuthenticateErr?) -> Unit) {
+        var email = email
+        var password = password
+        var authErr: AuthenticateErr? = null
+        var emailAddressErr = ""
+        var passwordErr = ""
+        var authenticateErr = ""
+        var errCount = 0
+
+
+        if(email == "" || email == null) {
+            emailAddressErr = "This field is required"
+            errCount++
+        }
+
+        val user = FirebaseAuth.getInstance().currentUser
+        if ((email != null  && email.isNotEmpty()) && user != null) {
+            val userEmail = user.email
+            if (userEmail != null) {
+                if (!email.equals(userEmail, ignoreCase = true)) {
+                    authenticateErr = "Invalid email or password"
+                    errCount++
+                }
+            }
+        }
+
+        if(password == "" || password == null) {
+            passwordErr = "This field is required"
+            errCount++
+        }
+
+        if(errCount == 0) {
+            FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener { signInTask ->
+                    if (signInTask.isSuccessful) {
+                        if (user != null) {
+                            var dialogFragment = DeleteConfirmActivity()
+                            dialogFragment.setCancelable(false)
+                            dialogFragment.show(supportFragmentManager, fragmentTag)
+                        } else {
+                            authenticateErr = "User not found. Please register."
+                            authErr = AuthenticateErr(
+                                emailAddressErr = emailAddressErr,
+                                passwordErr = passwordErr,
+                                authenticateErr = authenticateErr
+                            )
+                            if (authErr != null) {
+                                callback(authErr)
+                            } else {
+                                callback(null)
+                            }
+                        }
+                    } else {
+                        authenticateErr = "Invalid email or password."
+                        authErr = AuthenticateErr(
+                            emailAddressErr = emailAddressErr,
+                            passwordErr = passwordErr,
+                            authenticateErr = authenticateErr
+                        )
+                        if (authErr != null) {
+                            callback(authErr)
+                        } else {
+                            callback(null)
+                        }
+                    }
+                }
+        }
+        authErr = AuthenticateErr(
+            emailAddressErr = emailAddressErr,
+            passwordErr = passwordErr,
+            authenticateErr = authenticateErr
+        )
+        if (authErr != null) {
+            callback(authErr)
+        } else {
+            callback(null)
+        }
+    }
+
     fun deleteAccount(context: Context) {
         val user = FirebaseAuth.getInstance().currentUser
         Log.i("UserID", user?.uid ?: "User not logged in")
@@ -439,18 +760,22 @@ object DatabaseFunctions {
                                     context.startActivity(Intent(context, LoginActivity::class.java))
                                 }
                                 .addOnFailureListener { e ->
-                                    Toast.makeText(context, "Error deleting user: ${e.message}", Toast.LENGTH_LONG).show()
+                                    Log.e("Error", "Error deleting user: ${e.message}")
+                                    Toast.makeText(context, "Error deleting user.", Toast.LENGTH_LONG).show()
                                 }
                         }
                         .addOnFailureListener { e ->
-                            Toast.makeText(context, "Error deleting user document: ${e.message}", Toast.LENGTH_LONG).show()
+                            Log.e("Error", "Error deleting user document: ${e.message}")
+                            Toast.makeText(context, "Error deleting user.", Toast.LENGTH_LONG).show()
                         }
                 } else {
-                    Toast.makeText(context, "User document does not exist.", Toast.LENGTH_LONG).show()
+                    Log.e("Error", "User document does not exist.")
+                    Toast.makeText(context, "Error deleting user.", Toast.LENGTH_LONG).show()
                 }
             }
         } else {
-            Toast.makeText(context, "User not found.", Toast.LENGTH_SHORT).show()
+            Log.e("Error", "User not found.")
+            Toast.makeText(context, "Error deleting user.", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -720,7 +1045,7 @@ object DatabaseFunctions {
                         // Query 2: Get leaderboard for all levels
                         // (where user completed all levels, meaning current level is 3 and totalTimeCompleted > 0.0 or calculated)
                         db.collection("users")
-                            .whereEqualTo("currentLevel", 3)
+                            .whereEqualTo("currentLevel", 4)
                             .whereGreaterThan("totalTimeCompleted", 0.0)
                             .orderBy("totalTimeCompleted")
                             .limit(5)
@@ -750,7 +1075,7 @@ object DatabaseFunctions {
 
                         // Query 3: Get rank and details of user for all levels (if user completed all levels)
                         db.collection("users")
-                            .whereEqualTo("currentLevel", 3)
+                            .whereEqualTo("currentLevel", 4)
                             .whereGreaterThan("totalTimeCompleted", 0.0)
                             .orderBy("totalTimeCompleted")
                             .get()

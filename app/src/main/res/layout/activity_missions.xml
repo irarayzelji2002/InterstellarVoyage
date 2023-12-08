@@ -35,6 +35,798 @@
         android:layout_marginTop="25dp"
         app:layout_constraintTop_toTopOf="parent" />
 
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/txtMissionsTitle">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:layout_marginTop="15dp">
+
+            <!--LEVEL 0-->
+            <LinearLayout
+                android:id="@+id/level0Container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="30dp"
+                android:background="@drawable/blur_bg"
+                tools:layout_editor_absoluteX="20dp"
+                android:paddingVertical="6dp"
+                android:paddingHorizontal="18dp"
+                android:gravity="center_horizontal|bottom"
+                android:orientation="vertical"
+                android:layout_marginBottom="15dp"
+                android:visibility="visible">
+
+                <!--LEVEL & TITLE-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal"
+                    android:layout_marginBottom="10dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/sharpsans_semibold"
+                        android:textAlignment="viewStart"
+                        android:paddingVertical="3dp"
+                        android:text="LEVEL 0"
+                        android:textColor="#FFFFFF"
+                        android:textSize="16sp"
+                        android:layout_alignParentLeft="true" />
+                    <TextView
+                        android:id="@+id/txtLevel0Name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/sharpsans_bold"
+                        android:textAlignment="viewStart"
+                        android:paddingVertical="3dp"
+                        android:text="LOCKED"
+                        android:textColor="#FFFFFF"
+                        android:textSize="22sp"
+                        android:layout_alignParentLeft="true"
+                        android:layout_marginTop="-12dp"/>
+
+                </LinearLayout>
+
+                <!--SUB MISSION 2-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="-5dp"
+                    android:layout_marginBottom="12dp"
+                    android:gravity="center_horizontal"
+                    android:background="@drawable/blue_container">
+                    <TextView
+                        android:id="@+id/subMission1Name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="37dp"
+                        android:fontFamily="@font/sharpsans"
+                        android:paddingVertical="3dp"
+                        android:text="Sub Mission 1 Name"
+                        android:textColor="#FFFFFF"
+                        android:textSize="18sp"
+                        android:padding="5dp"
+                        android:visibility="gone"/>
+                    <ImageView
+                        android:id="@+id/subMission1Lock"
+                        android:layout_width="match_parent"
+                        android:layout_height="37dp"
+                        app:srcCompat="@drawable/ic_lock"
+                        android:padding="6dp"
+                        android:visibility="visible"/>
+                </LinearLayout>
+
+                <!--SUB MISSION 3-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="-5dp"
+                    android:layout_marginBottom="12dp"
+                    android:gravity="center_horizontal"
+                    android:background="@drawable/blue_container">
+                    <TextView
+                        android:id="@+id/subMission2Name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="37dp"
+                        android:fontFamily="@font/sharpsans"
+                        android:paddingVertical="3dp"
+                        android:text="Sub Mission 2 Name"
+                        android:textColor="#FFFFFF"
+                        android:textSize="18sp"
+                        android:padding="5dp"
+                        android:visibility="gone"/>
+                    <ImageView
+                        android:id="@+id/subMission2Lock"
+                        android:layout_width="match_parent"
+                        android:layout_height="37dp"
+                        app:srcCompat="@drawable/ic_lock"
+                        android:padding="6dp"
+                        android:visibility="visible"/>
+                </LinearLayout>
+
+                <!--SUB MISSION 3-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="-5dp"
+                    android:layout_marginBottom="12dp"
+                    android:gravity="center_horizontal"
+                    android:background="@drawable/blue_container">
+                    <TextView
+                        android:id="@+id/subMission3Name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="37dp"
+                        android:fontFamily="@font/sharpsans"
+                        android:paddingVertical="3dp"
+                        android:text="Sub Mission 3 Name"
+                        android:textColor="#FFFFFF"
+                        android:textSize="18sp"
+                        android:padding="5dp"
+                        android:visibility="gone"/>
+                    <ImageView
+                        android:id="@+id/subMission3Lock"
+                        android:layout_width="match_parent"
+                        android:layout_height="37dp"
+                        app:srcCompat="@drawable/ic_lock"
+                        android:padding="6dp"
+                        android:visibility="visible"/>
+                </LinearLayout>
+
+                <!--SUB MISSION 4-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="-5dp"
+                    android:layout_marginBottom="12dp"
+                    android:gravity="center_horizontal"
+                    android:background="@drawable/blue_container">
+                    <TextView
+                        android:id="@+id/subMission4Name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="37dp"
+                        android:fontFamily="@font/sharpsans"
+                        android:paddingVertical="3dp"
+                        android:text="Sub Mission 4 Name"
+                        android:textColor="#FFFFFF"
+                        android:textSize="18sp"
+                        android:padding="5dp"
+                        android:visibility="gone"/>
+                    <ImageView
+                        android:id="@+id/subMission4Lock"
+                        android:layout_width="match_parent"
+                        android:layout_height="37dp"
+                        app:srcCompat="@drawable/ic_lock"
+                        android:padding="6dp"
+                        android:visibility="visible"/>
+                </LinearLayout>
+
+                <!--SUB MISSION 5-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="-5dp"
+                    android:layout_marginBottom="12dp"
+                    android:gravity="center_horizontal"
+                    android:background="@drawable/blue_container">
+                    <TextView
+                        android:id="@+id/subMission5Name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="37dp"
+                        android:fontFamily="@font/sharpsans"
+                        android:paddingVertical="3dp"
+                        android:text="Sub Mission 5 Name"
+                        android:textColor="#FFFFFF"
+                        android:textSize="18sp"
+                        android:padding="5dp"
+                        android:visibility="gone"/>
+                    <ImageView
+                        android:id="@+id/subMission5Lock"
+                        android:layout_width="match_parent"
+                        android:layout_height="37dp"
+                        app:srcCompat="@drawable/ic_lock"
+                        android:padding="6dp"
+                        android:visibility="visible"/>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!--LEVEL 1-->
+            <LinearLayout
+                android:id="@+id/level1Container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="30dp"
+                android:background="@drawable/blur_bg"
+                tools:layout_editor_absoluteX="20dp"
+                android:paddingVertical="6dp"
+                android:paddingHorizontal="18dp"
+                android:gravity="center_horizontal|bottom"
+                android:orientation="vertical"
+                android:layout_marginBottom="15dp"
+                android:visibility="visible">
+
+                <!--LEVEL & TITLE-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal"
+                    android:layout_marginBottom="10dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/sharpsans_semibold"
+                        android:textAlignment="viewStart"
+                        android:paddingVertical="3dp"
+                        android:text="LEVEL 1"
+                        android:textColor="#FFFFFF"
+                        android:textSize="16sp"
+                        android:layout_alignParentLeft="true" />
+                    <TextView
+                        android:id="@+id/txtLevel1Name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/sharpsans_bold"
+                        android:textAlignment="viewStart"
+                        android:paddingVertical="3dp"
+                        android:text="LOCKED"
+                        android:textColor="#FFFFFF"
+                        android:textSize="22sp"
+                        android:layout_alignParentLeft="true"
+                        android:layout_marginTop="-12dp"/>
+
+                </LinearLayout>
+
+                <!--SUB MISSION 2-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="-5dp"
+                    android:layout_marginBottom="12dp"
+                    android:gravity="center_horizontal"
+                    android:background="@drawable/blue_container">
+                    <TextView
+                        android:id="@+id/subMission6Name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="37dp"
+                        android:fontFamily="@font/sharpsans"
+                        android:paddingVertical="3dp"
+                        android:text="Sub Mission 1 Name"
+                        android:textColor="#FFFFFF"
+                        android:textSize="18sp"
+                        android:padding="5dp"
+                        android:visibility="gone"/>
+                    <ImageView
+                        android:id="@+id/subMission6Lock"
+                        android:layout_width="match_parent"
+                        android:layout_height="37dp"
+                        app:srcCompat="@drawable/ic_lock"
+                        android:padding="6dp"
+                        android:visibility="visible"/>
+                </LinearLayout>
+
+                <!--SUB MISSION 3-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="-5dp"
+                    android:layout_marginBottom="12dp"
+                    android:gravity="center_horizontal"
+                    android:background="@drawable/blue_container">
+                    <TextView
+                        android:id="@+id/subMission7Name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="37dp"
+                        android:fontFamily="@font/sharpsans"
+                        android:paddingVertical="3dp"
+                        android:text="Sub Mission 2 Name"
+                        android:textColor="#FFFFFF"
+                        android:textSize="18sp"
+                        android:padding="5dp"
+                        android:visibility="gone"/>
+                    <ImageView
+                        android:id="@+id/subMission7Lock"
+                        android:layout_width="match_parent"
+                        android:layout_height="37dp"
+                        app:srcCompat="@drawable/ic_lock"
+                        android:padding="6dp"
+                        android:visibility="visible"/>
+                </LinearLayout>
+
+                <!--SUB MISSION 3-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="-5dp"
+                    android:layout_marginBottom="12dp"
+                    android:gravity="center_horizontal"
+                    android:background="@drawable/blue_container">
+                    <TextView
+                        android:id="@+id/subMission8Name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="37dp"
+                        android:fontFamily="@font/sharpsans"
+                        android:paddingVertical="3dp"
+                        android:text="Sub Mission 3 Name"
+                        android:textColor="#FFFFFF"
+                        android:textSize="18sp"
+                        android:padding="5dp"
+                        android:visibility="gone"/>
+                    <ImageView
+                        android:id="@+id/subMission8Lock"
+                        android:layout_width="match_parent"
+                        android:layout_height="37dp"
+                        app:srcCompat="@drawable/ic_lock"
+                        android:padding="6dp"
+                        android:visibility="visible"/>
+                </LinearLayout>
+
+                <!--SUB MISSION 4-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="-5dp"
+                    android:layout_marginBottom="12dp"
+                    android:gravity="center_horizontal"
+                    android:background="@drawable/blue_container">
+                    <TextView
+                        android:id="@+id/subMission9Name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="37dp"
+                        android:fontFamily="@font/sharpsans"
+                        android:paddingVertical="3dp"
+                        android:text="Sub Mission 4 Name"
+                        android:textColor="#FFFFFF"
+                        android:textSize="18sp"
+                        android:padding="5dp"
+                        android:visibility="gone"/>
+                    <ImageView
+                        android:id="@+id/subMission9Lock"
+                        android:layout_width="match_parent"
+                        android:layout_height="37dp"
+                        app:srcCompat="@drawable/ic_lock"
+                        android:padding="6dp"
+                        android:visibility="visible"/>
+                </LinearLayout>
+
+                <!--SUB MISSION 5-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="-5dp"
+                    android:layout_marginBottom="12dp"
+                    android:gravity="center_horizontal"
+                    android:background="@drawable/blue_container">
+                    <TextView
+                        android:id="@+id/subMission10Name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="37dp"
+                        android:fontFamily="@font/sharpsans"
+                        android:paddingVertical="3dp"
+                        android:text="Sub Mission 5 Name"
+                        android:textColor="#FFFFFF"
+                        android:textSize="18sp"
+                        android:padding="5dp"
+                        android:visibility="gone"/>
+                    <ImageView
+                        android:id="@+id/subMission10Lock"
+                        android:layout_width="match_parent"
+                        android:layout_height="37dp"
+                        app:srcCompat="@drawable/ic_lock"
+                        android:padding="6dp"
+                        android:visibility="visible"/>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!--LEVEL 2-->
+            <LinearLayout
+                android:id="@+id/level2Container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="30dp"
+                android:background="@drawable/blur_bg"
+                tools:layout_editor_absoluteX="20dp"
+                android:paddingVertical="6dp"
+                android:paddingHorizontal="18dp"
+                android:gravity="center_horizontal|bottom"
+                android:orientation="vertical"
+                android:layout_marginBottom="15dp"
+                android:visibility="visible">
+
+                <!--LEVEL & TITLE-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal"
+                    android:layout_marginBottom="10dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/sharpsans_semibold"
+                        android:textAlignment="viewStart"
+                        android:paddingVertical="3dp"
+                        android:text="LEVEL 2"
+                        android:textColor="#FFFFFF"
+                        android:textSize="16sp"
+                        android:layout_alignParentLeft="true" />
+                    <TextView
+                        android:id="@+id/txtLevel2Name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/sharpsans_bold"
+                        android:textAlignment="viewStart"
+                        android:paddingVertical="3dp"
+                        android:text="LOCKED"
+                        android:textColor="#FFFFFF"
+                        android:textSize="22sp"
+                        android:layout_alignParentLeft="true"
+                        android:layout_marginTop="-12dp"/>
+
+                </LinearLayout>
+
+                <!--SUB MISSION 2-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="-5dp"
+                    android:layout_marginBottom="12dp"
+                    android:gravity="center_horizontal"
+                    android:background="@drawable/blue_container">
+                    <TextView
+                        android:id="@+id/subMission11Name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="37dp"
+                        android:fontFamily="@font/sharpsans"
+                        android:paddingVertical="3dp"
+                        android:text="Sub Mission 1 Name"
+                        android:textColor="#FFFFFF"
+                        android:textSize="18sp"
+                        android:padding="5dp"
+                        android:visibility="gone"/>
+                    <ImageView
+                        android:id="@+id/subMission11Lock"
+                        android:layout_width="match_parent"
+                        android:layout_height="37dp"
+                        app:srcCompat="@drawable/ic_lock"
+                        android:padding="6dp"
+                        android:visibility="visible"/>
+                </LinearLayout>
+
+                <!--SUB MISSION 3-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="-5dp"
+                    android:layout_marginBottom="12dp"
+                    android:gravity="center_horizontal"
+                    android:background="@drawable/blue_container">
+                    <TextView
+                        android:id="@+id/subMission12Name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="37dp"
+                        android:fontFamily="@font/sharpsans"
+                        android:paddingVertical="3dp"
+                        android:text="Sub Mission 2 Name"
+                        android:textColor="#FFFFFF"
+                        android:textSize="18sp"
+                        android:padding="5dp"
+                        android:visibility="gone"/>
+                    <ImageView
+                        android:id="@+id/subMission12Lock"
+                        android:layout_width="match_parent"
+                        android:layout_height="37dp"
+                        app:srcCompat="@drawable/ic_lock"
+                        android:padding="6dp"
+                        android:visibility="visible"/>
+                </LinearLayout>
+
+                <!--SUB MISSION 3-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="-5dp"
+                    android:layout_marginBottom="12dp"
+                    android:gravity="center_horizontal"
+                    android:background="@drawable/blue_container">
+                    <TextView
+                        android:id="@+id/subMission13Name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="37dp"
+                        android:fontFamily="@font/sharpsans"
+                        android:paddingVertical="3dp"
+                        android:text="Sub Mission 3 Name"
+                        android:textColor="#FFFFFF"
+                        android:textSize="18sp"
+                        android:padding="5dp"
+                        android:visibility="gone"/>
+                    <ImageView
+                        android:id="@+id/subMission13Lock"
+                        android:layout_width="match_parent"
+                        android:layout_height="37dp"
+                        app:srcCompat="@drawable/ic_lock"
+                        android:padding="6dp"
+                        android:visibility="visible"/>
+                </LinearLayout>
+
+                <!--SUB MISSION 4-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="-5dp"
+                    android:layout_marginBottom="12dp"
+                    android:gravity="center_horizontal"
+                    android:background="@drawable/blue_container">
+                    <TextView
+                        android:id="@+id/subMission14Name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="37dp"
+                        android:fontFamily="@font/sharpsans"
+                        android:paddingVertical="3dp"
+                        android:text="Sub Mission 4 Name"
+                        android:textColor="#FFFFFF"
+                        android:textSize="18sp"
+                        android:padding="5dp"
+                        android:visibility="gone"/>
+                    <ImageView
+                        android:id="@+id/subMission14Lock"
+                        android:layout_width="match_parent"
+                        android:layout_height="37dp"
+                        app:srcCompat="@drawable/ic_lock"
+                        android:padding="6dp"
+                        android:visibility="visible"/>
+                </LinearLayout>
+
+                <!--SUB MISSION 5-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="-5dp"
+                    android:layout_marginBottom="12dp"
+                    android:gravity="center_horizontal"
+                    android:background="@drawable/blue_container">
+                    <TextView
+                        android:id="@+id/subMission15Name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="37dp"
+                        android:fontFamily="@font/sharpsans"
+                        android:paddingVertical="3dp"
+                        android:text="Sub Mission 5 Name"
+                        android:textColor="#FFFFFF"
+                        android:textSize="18sp"
+                        android:padding="5dp"
+                        android:visibility="gone"/>
+                    <ImageView
+                        android:id="@+id/subMission15Lock"
+                        android:layout_width="match_parent"
+                        android:layout_height="37dp"
+                        app:srcCompat="@drawable/ic_lock"
+                        android:padding="6dp"
+                        android:visibility="visible"/>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!--LEVEL 3-->
+            <LinearLayout
+                android:id="@+id/level3Container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="30dp"
+                android:background="@drawable/blur_bg"
+                tools:layout_editor_absoluteX="20dp"
+                android:paddingVertical="6dp"
+                android:paddingHorizontal="18dp"
+                android:gravity="center_horizontal|bottom"
+                android:orientation="vertical"
+                android:layout_marginBottom="15dp"
+                android:visibility="visible">
+
+                <!--LEVEL & TITLE-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal"
+                    android:layout_marginBottom="10dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/sharpsans_semibold"
+                        android:textAlignment="viewStart"
+                        android:paddingVertical="3dp"
+                        android:text="LEVEL 3"
+                        android:textColor="#FFFFFF"
+                        android:textSize="16sp"
+                        android:layout_alignParentLeft="true" />
+                    <TextView
+                        android:id="@+id/txtLevel3Name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/sharpsans_bold"
+                        android:textAlignment="viewStart"
+                        android:paddingVertical="3dp"
+                        android:text="LOCKED"
+                        android:textColor="#FFFFFF"
+                        android:textSize="22sp"
+                        android:layout_alignParentLeft="true"
+                        android:layout_marginTop="-12dp"/>
+
+                </LinearLayout>
+
+                <!--SUB MISSION 2-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="-5dp"
+                    android:layout_marginBottom="12dp"
+                    android:gravity="center_horizontal"
+                    android:background="@drawable/blue_container">
+                    <TextView
+                        android:id="@+id/subMission16Name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="37dp"
+                        android:fontFamily="@font/sharpsans"
+                        android:paddingVertical="3dp"
+                        android:text="Sub Mission 1 Name"
+                        android:textColor="#FFFFFF"
+                        android:textSize="18sp"
+                        android:padding="5dp"
+                        android:visibility="gone"/>
+                    <ImageView
+                        android:id="@+id/subMission16Lock"
+                        android:layout_width="match_parent"
+                        android:layout_height="37dp"
+                        app:srcCompat="@drawable/ic_lock"
+                        android:padding="6dp"
+                        android:visibility="visible"/>
+                </LinearLayout>
+
+                <!--SUB MISSION 3-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="-5dp"
+                    android:layout_marginBottom="12dp"
+                    android:gravity="center_horizontal"
+                    android:background="@drawable/blue_container">
+                    <TextView
+                        android:id="@+id/subMission17Name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="37dp"
+                        android:fontFamily="@font/sharpsans"
+                        android:paddingVertical="3dp"
+                        android:text="Sub Mission 2 Name"
+                        android:textColor="#FFFFFF"
+                        android:textSize="18sp"
+                        android:padding="5dp"
+                        android:visibility="gone"/>
+                    <ImageView
+                        android:id="@+id/subMission17Lock"
+                        android:layout_width="match_parent"
+                        android:layout_height="37dp"
+                        app:srcCompat="@drawable/ic_lock"
+                        android:padding="6dp"
+                        android:visibility="visible"/>
+                </LinearLayout>
+
+                <!--SUB MISSION 3-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="-5dp"
+                    android:layout_marginBottom="12dp"
+                    android:gravity="center_horizontal"
+                    android:background="@drawable/blue_container">
+                    <TextView
+                        android:id="@+id/subMission18Name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="37dp"
+                        android:fontFamily="@font/sharpsans"
+                        android:paddingVertical="3dp"
+                        android:text="Sub Mission 3 Name"
+                        android:textColor="#FFFFFF"
+                        android:textSize="18sp"
+                        android:padding="5dp"
+                        android:visibility="gone"/>
+                    <ImageView
+                        android:id="@+id/subMission18Lock"
+                        android:layout_width="match_parent"
+                        android:layout_height="37dp"
+                        app:srcCompat="@drawable/ic_lock"
+                        android:padding="6dp"
+                        android:visibility="visible"/>
+                </LinearLayout>
+
+                <!--SUB MISSION 4-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="-5dp"
+                    android:layout_marginBottom="12dp"
+                    android:gravity="center_horizontal"
+                    android:background="@drawable/blue_container">
+                    <TextView
+                        android:id="@+id/subMission19Name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="37dp"
+                        android:fontFamily="@font/sharpsans"
+                        android:paddingVertical="3dp"
+                        android:text="Sub Mission 4 Name"
+                        android:textColor="#FFFFFF"
+                        android:textSize="18sp"
+                        android:padding="5dp"
+                        android:visibility="gone"/>
+                    <ImageView
+                        android:id="@+id/subMission19Lock"
+                        android:layout_width="match_parent"
+                        android:layout_height="37dp"
+                        app:srcCompat="@drawable/ic_lock"
+                        android:padding="6dp"
+                        android:visibility="visible"/>
+                </LinearLayout>
+
+                <!--SUB MISSION 5-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="-5dp"
+                    android:layout_marginBottom="12dp"
+                    android:gravity="center_horizontal"
+                    android:background="@drawable/blue_container">
+                    <TextView
+                        android:id="@+id/subMission20Name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="37dp"
+                        android:fontFamily="@font/sharpsans"
+                        android:paddingVertical="3dp"
+                        android:text="Sub Mission 5 Name"
+                        android:textColor="#FFFFFF"
+                        android:textSize="18sp"
+                        android:padding="5dp"
+                        android:visibility="gone"/>
+                    <ImageView
+                        android:id="@+id/subMission20Lock"
+                        android:layout_width="match_parent"
+                        android:layout_height="37dp"
+                        app:srcCompat="@drawable/ic_lock"
+                        android:padding="6dp"
+                        android:visibility="visible"/>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!--EXTRA SPACE-->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="170dp" />
+        </LinearLayout>
+    </ScrollView>
+
+    <!--MOON & BACK-->
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"

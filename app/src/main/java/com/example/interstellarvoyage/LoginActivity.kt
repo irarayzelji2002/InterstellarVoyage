@@ -2,6 +2,8 @@ package com.example.interstellarvoyage
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
@@ -23,6 +25,9 @@ class LoginActivity : AppCompatActivity() {
 
         val editTextEmailAddress = findViewById<EditText>(R.id.editTextEmailAddress)
         val editTextPassword = findViewById<EditText>(R.id.editTextPassword)
+
+        val emailAddressErr = findViewById<TextView>(R.id.emailAddressErr)
+        val passwordErr = findViewById<TextView>(R.id.passwordErr)
         val loginErr = findViewById<TextView>(R.id.loginErr)
 
         FirebaseApp.initializeApp(this)
@@ -31,7 +36,17 @@ class LoginActivity : AppCompatActivity() {
         btnLogin.setOnClickListener {
             val email = editTextEmailAddress.text.toString()
             val password = editTextPassword.text.toString()
-            DatabaseFunctions.login(this, email, password)
+            DatabaseFunctions.login(this, email, password) { errors ->
+                if(errors != null) {
+                    Log.d("Error", "Email Address: ${errors.emailAddressErr}")
+                    Log.d("Error", "Password: ${errors.passwordErr}")
+                    Log.d("Error", "Login Error: ${errors.authenticateErr}")
+
+                    setErrorTextAndVisibility(emailAddressErr, errors.emailAddressErr)
+                    setErrorTextAndVisibility(passwordErr, errors.passwordErr)
+                    setErrorTextAndVisibility(loginErr, errors.authenticateErr)
+                }
+            }
         }
 
         btnRegAccount.setOnClickListener{
@@ -53,5 +68,14 @@ class LoginActivity : AppCompatActivity() {
             startActivity(Intent(this, TestGameActivity::class.java))
         }
         //Don't Delete below this
+    }
+
+    fun setErrorTextAndVisibility(view: TextView, error: String) {
+        if (error.isNotEmpty() && error != null) {
+            view.visibility = View.VISIBLE
+            view.text = error
+        } else {
+            view.visibility = View.GONE
+        }
     }
 }

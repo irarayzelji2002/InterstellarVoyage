@@ -9,7 +9,8 @@ object GameData {
         Level(0, "Earth’s Great Dilemma"),
         Level(1, "Search for New Habitat"),
         Level(2, "Beacon in the Galaxy"),
-        Level(3, "The Cosmic Council")
+        Level(3, "The Cosmic Council"),
+        Level(4, "")
     )
 
     val missions = listOf(
@@ -21,7 +22,7 @@ object GameData {
         Mission("1.1", "Comfort of Cryosleep"),
         Mission("1.2", "Awakenings Aboard"),
         Mission("1.3", "Leaving to Land"),
-        Mission("1.4", "Lively and Lookin"),
+        Mission("1.4", "Lively and Looking"),
         Mission("1.5", "Extra Exploration"),
         Mission("2.1", "Scrambled Sounds"),
         Mission("2.2", "Forward Fiasco"),
