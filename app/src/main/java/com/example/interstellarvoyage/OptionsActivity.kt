@@ -80,7 +80,9 @@ class OptionsActivity : AppCompatActivity() {
         }
 
         btnLogout.setOnClickListener {
-            DatabaseFunctions.logout(this)
+            var dialogFragment = LogoutConfirmActivity()
+            dialogFragment.setCancelable(false)
+            dialogFragment.show(supportFragmentManager, "Logout Confirm Dialog")
         }
 
         btnDeleteAccount.setOnClickListener {

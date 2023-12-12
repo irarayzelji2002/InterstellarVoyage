@@ -324,7 +324,7 @@ object DatabaseFunctions {
 
                                                 userDocumentRef.set(userData)
                                                     .addOnSuccessListener {
-                                                        //Toast.makeText(context, "Account created, please log in.", Toast.LENGTH_LONG).show()
+                                                        Toast.makeText(context, "Account created, please log in.", Toast.LENGTH_LONG).show()
                                                         context.startActivity(Intent(context, LoginActivity::class.java))
                                                     }
                                                     .addOnFailureListener { e ->
