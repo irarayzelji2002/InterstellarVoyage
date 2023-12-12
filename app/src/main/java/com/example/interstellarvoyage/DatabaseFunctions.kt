@@ -1444,5 +1444,17 @@ object DatabaseFunctions {
             Toast.makeText(context, "User not found.", Toast.LENGTH_SHORT).show()
         }
     }
+
+    fun changeEmailAdd(context: TestDatabaseActivity, email: String, password: String) {
+
+    }
+
+    fun changeUsername(context: TestDatabaseActivity, newUsername: String) {
+
+    }
+
+    fun changePassword(context: TestDatabaseActivity, oldpassword: String, newpassword: String, confirmnewpassword: String) {
+
+    }
     // Don't delete below this
 }

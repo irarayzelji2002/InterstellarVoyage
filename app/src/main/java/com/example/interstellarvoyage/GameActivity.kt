@@ -67,8 +67,10 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback {
         // Options Button
         var btnOptions : ImageButton = findViewById(R.id.btnOptions)
 
+/*
 
         var lvlCompleted: Button = findViewById(R.id.lvlComplete)
+*/
 
         // Populate activity info from database
         DatabaseFunctions.accessUserDocument(this) { userDocument ->
@@ -154,37 +156,49 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback {
             countdownTimer?.cancel()
         }
 
-        //Clicks Per Second.
+        //Clicks Per Seconds
+
+        // Define a constant for the minimum click interval (in milliseconds)
+         val MIN_CLICK_INTERVAL = 10 // Adjust this value as needed
+
         fun calculateCPS(): Float {
             val currentTimeMillis = System.currentTimeMillis()
+            val elapsedTime = currentTimeMillis - lastClickTime
 
-            // Check if one second has passed since the last click
-            if (currentTimeMillis - lastClickTime >= 1000) {
-                // Calculate CPS
-                val clicksPerSecond = clicksInCurrentSecond.toFloat()
-                txtCPS.text = String.format("%.2f", ClicksperSecond)
-
-                // Reset counters for the next second
-                clicksInCurrentSecond = 0
-                lastClickTime = currentTimeMillis
-
-                return clicksPerSecond
-
-            } else {
-                // Increment click count within the current second
-                clicksInCurrentSecond++
-                return 0f
+            // Check if the click occurred within the minimum interval
+            if (elapsedTime < MIN_CLICK_INTERVAL) {
+                return 0f // Ignore the click, too soon after the last one
             }
+
+            Log.d("CPS Debug", "Elapsed Time: $elapsedTime ms")
+
+            // Calculate CPS based on total clicks and elapsed time
+            val cps = if (elapsedTime > 0) {
+                (TotalMissionClicks.toFloat() * 1000f / elapsedTime) / 1000f
+            } else {
+                0f
+            }
+
+            Log.d("CPS Debug", "CPS: $cps")
+
+            // Increment click count within the current second
+            clicksInCurrentSecond++
+
+            // Update last click time
+            lastClickTime = currentTimeMillis
+
+            // Limit CPS to two decimal points
+            return String.format("%.2f", cps).toFloat()
         }
 
 
-        lvlCompleted.setOnClickListener{
+      /*  lvlCompleted.setOnClickListener{
             Clicks = 0;
             TotalMissionClicks = 0;
             stopCountdownTimer()
             DatabaseFunctions.levelCompleted(this,0,"0.0",0.0,0,0.0)
             Log.i("info", "Current Mission: " + remainingTime.toDouble()+ " TotalMissionClicks: " + TotalMissionClicks + "Duration: " + remainingTime.toString())
-        }
+        }*/
 
         // LEVEL 0; 500 clicks (100/sub mission); Earth’s Great Dilemma
         btnLevel0Clicker.setOnClickListener(object : View.OnClickListener {
@@ -196,8 +210,11 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback {
                 MissionReq = 100
 
                 //CLICKS PER SECOND
-                calculateCPS()
+                // Calculate CPS
+                val cps = calculateCPS()
+                txtCPS.text = String.format("%.2f", cps)
 
+                Log.i("CPS", cps.toString())
 
                 //LEVEL MISSION
                 TotalMissionClicks+=5
@@ -235,9 +252,7 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback {
                                             "TotalMissionClicks: " + TotalMissionClicks +
                                             "Duration: " + remainingTime.toString(),
                                             Toast.LENGTH_LONG).show();
-                            }
-                        }
-                    }
+                            }}}
 
 
                    stopCountdownTimer() // Stop the countdown timer when the a ctivity is destroyed
@@ -263,7 +278,7 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback {
                     }
                 }
 
-                if (TotalMissionClicks == 0) {
+                if (TotalMissionClicks >= 0) {
                     if (buffer == 0) {
                         startCountdownTimer()
                         buffer++
