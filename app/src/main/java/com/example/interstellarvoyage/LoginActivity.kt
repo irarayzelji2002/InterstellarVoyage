@@ -42,9 +42,12 @@ class LoginActivity : AppCompatActivity() {
                     Log.d("Error", "Password: ${errors.passwordErr}")
                     Log.d("Error", "Login Error: ${errors.authenticateErr}")
 
-                    setErrorTextAndVisibility(emailAddressErr, errors.emailAddressErr)
-                    setErrorTextAndVisibility(passwordErr, errors.passwordErr)
-                    setErrorTextAndVisibility(loginErr, errors.authenticateErr)
+                    if(errors.emailAddressErr != "" || errors.passwordErr !="") {
+                        setErrorTextAndVisibility(emailAddressErr, errors.emailAddressErr)
+                        setErrorTextAndVisibility(passwordErr, errors.passwordErr)
+                    } else {
+                        setErrorTextAndVisibility(loginErr, errors.authenticateErr)
+                    }
                 }
             }
         }

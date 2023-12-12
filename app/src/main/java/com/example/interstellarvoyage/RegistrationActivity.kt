@@ -48,11 +48,14 @@ class RegistrationActivity : AppCompatActivity() {
                     Log.d("Error", "Confirm Password: ${errors.confirmPasswordErr}")
                     Log.d("Error", "Register Error: ${errors.registerErr}")
 
-                    setErrorTextAndVisibility(usernameErr, errors.usernameErr)
-                    setErrorTextAndVisibility(emailAddressErr, errors.emailAddressErr)
-                    setErrorTextAndVisibility(passwordErr, errors.passwordErr)
-                    setErrorTextAndVisibility(confirmPasswordErr, errors.confirmPasswordErr)
-                    setErrorTextAndVisibility(registerErr, errors.registerErr)
+                    if(errors.usernameErr != "" || errors.emailAddressErr != "" || errors.passwordErr != "" || errors.confirmPasswordErr != "") {
+                        setErrorTextAndVisibility(usernameErr, errors.usernameErr)
+                        setErrorTextAndVisibility(emailAddressErr, errors.emailAddressErr)
+                        setErrorTextAndVisibility(passwordErr, errors.passwordErr)
+                        setErrorTextAndVisibility(confirmPasswordErr, errors.confirmPasswordErr)
+                    } else {
+                        setErrorTextAndVisibility(registerErr, errors.registerErr)
+                    }
                 }
             }
         }

@@ -38,9 +38,12 @@ class DeleteAccountActivity : AppCompatActivity() {
                     Log.d("Error", "Password: ${errors.passwordErr}")
                     Log.d("Error", "Authenticate Error: ${errors.authenticateErr}")
 
-                    setErrorTextAndVisibility(emailAddressErr, errors.emailAddressErr)
-                    setErrorTextAndVisibility(passwordErr, errors.passwordErr)
-                    setErrorTextAndVisibility(deleteAccountErr, errors.authenticateErr)
+                    if(errors.emailAddressErr != "" || errors.passwordErr !="") {
+                        setErrorTextAndVisibility(emailAddressErr, errors.emailAddressErr)
+                        setErrorTextAndVisibility(passwordErr, errors.passwordErr)
+                    } else {
+                        setErrorTextAndVisibility(deleteAccountErr, errors.authenticateErr)
+                    }
                 }
             }
         }

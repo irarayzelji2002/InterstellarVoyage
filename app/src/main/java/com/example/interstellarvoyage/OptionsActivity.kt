@@ -56,7 +56,7 @@ class OptionsActivity : AppCompatActivity() {
                     goldUser.visibility = View.GONE
                     silverUser.visibility = View.VISIBLE
                     txtUsernameSilver.text = username
-                } else if (currentLevel == 3) {
+                } else if (currentLevel >= 3) {
                     txtUsernameGold.text = username
                 }
                 txtEmailAddress.text = emailAdd

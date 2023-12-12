@@ -68,6 +68,24 @@ data class AuthenticateErr( //for login and delete account
     val authenticateErr: String
 )
 
+data class ChangeUsernameErr( //for change username
+    val usernameErr: String,
+    val changeUsernameErr: String
+)
+
+data class ChangePasswordErr( //for change password
+    val oldPasswordErr: String,
+    val newPasswordErr: String,
+    val confirmNewPasswordErr: String,
+    val changePasswordErr: String
+)
+
+data class ChangeEmailErr( //for change email
+    val newEmailErr: String,
+    val passwordErr: String,
+    val changeEmailErr: String
+)
+
 object DatabaseFunctions {
     val db = FirebaseFirestore.getInstance()
 
@@ -506,71 +524,191 @@ object DatabaseFunctions {
         }
     }
 
-    fun changeEmailAdd(context: Context, email: String, password: String,) {
-        val user = FirebaseAuth.getInstance().currentUser
-        Log.i("test","outside if")
-        if (user != null) {
-            // Reauthenticate the user
-            val credential = EmailAuthProvider.getCredential(user.email!!, password)
-            user.reauthenticate(credential)
-                .addOnCompleteListener { reauthTask ->
-                    if (reauthTask.isSuccessful) {
-                        // Update the email address in Firebase Authentication
-                        user.sendEmailVerification()
-                            .addOnCompleteListener { emailVerificationTask ->
-                                if (emailVerificationTask.isSuccessful) {
-                                    Toast.makeText(context, "Verification email sent to ${user.email} and $email", Toast.LENGTH_LONG).show()
+    fun changeEmailAdd(context: Context, email: String, password: String, callback: (ChangeEmailErr?) -> Unit) {
+        var email = email
+        var password = password
+        var changeEmailErr: ChangeEmailErr? = null
+        var emailErr = ""
+        var passwordErr = ""
+        var changeEmailGeneralErr = ""
+        var errCount = 0
 
-                                    val userDocumentRef = db.collection("users").document(user.uid)
-                                    userDocumentRef.get().addOnSuccessListener { documentSnapshot ->
-                                        if (documentSnapshot.exists()) {
-                                            // Update email change flag in document
-                                            userDocumentRef.update("userDetails.emailChangeFlag", true)
-                                                .addOnSuccessListener {
-                                                    Log.d("FirestoreData", "Email change flag set to true")
-                                                }
-                                                .addOnFailureListener { e ->
-                                                    Log.e("FirestoreData", "Email change flag update failed: $e")
-                                                }
-                                            // Sign out and go to login page
-                                            FirebaseAuth.getInstance().signOut()
-                                            val userPref = context.getSharedPreferences("UserPrefs", MODE_PRIVATE)
-                                            val editor = userPref.edit()
-                                            editor.putBoolean("isLoggedIn", false)
-                                            editor.apply()
-                                            context.startActivity(Intent(context, LoginActivity::class.java))
-                                        } else {
-                                            Log.d("FirestoreData", "No such document")
-                                        }
-                                    }
+        val emailRegex = "^[A-Za-z](.*)([@]{1})(.{1,})(\\.)(.{1,})"
+        if(email == "" || email == null) {
+            emailErr = "This field is required"
+            errCount++
+        } else if (!email.matches(emailRegex.toRegex())) {
+            emailErr = "Email address is not valid."
+            errCount++
+        }
+        if(password == "" || password == null) {
+            passwordErr = "This field is required"
+            errCount++
+        }
 
-                                    user.verifyBeforeUpdateEmail(email)
-                                        .addOnCompleteListener { task ->
-                                            if (task.isSuccessful) {
-                                                if(user.isEmailVerified) {
+        if(errCount == 0) {
+            val user = FirebaseAuth.getInstance().currentUser
+            if (user != null) {
+                // Reauthenticate the user
+                val credential = EmailAuthProvider.getCredential(user.email!!, password)
+                user.reauthenticate(credential)
+                    .addOnCompleteListener { reauthTask ->
+                        if (reauthTask.isSuccessful) {
+                            // Update the email address in Firebase Authentication
+                            user.sendEmailVerification()
+                                .addOnCompleteListener { emailVerificationTask ->
+                                    if (emailVerificationTask.isSuccessful) {
+                                        Toast.makeText(context, "Verification email sent to ${user.email} and $email", Toast.LENGTH_LONG).show()
+
+                                        val userDocumentRef = db.collection("users").document(user.uid)
+                                        userDocumentRef.get().addOnSuccessListener { documentSnapshot ->
+                                            if (documentSnapshot.exists()) {
+                                                // Update email change flag in document
+                                                userDocumentRef.update("userDetails.emailChangeFlag", true)
+                                                    .addOnSuccessListener {
+                                                        Log.d("FirestoreData", "Email change flag set to true")
+                                                    }
+                                                    .addOnFailureListener { e ->
+                                                        Log.e("FirestoreData", "Email change flag update failed: $e")
+                                                    }
+                                                // Sign out and go to login page
+                                                FirebaseAuth.getInstance().signOut()
+                                                val userPref = context.getSharedPreferences("UserPrefs", MODE_PRIVATE)
+                                                val editor = userPref.edit()
+                                                editor.putBoolean("isLoggedIn", false)
+                                                editor.apply()
+                                                context.startActivity(Intent(context, LoginActivity::class.java))
+                                            } else {
+                                                Log.d("FirestoreData", "No such document")
+                                                changeEmailGeneralErr = "Error updating email. Please try again."
+                                                changeEmailErr = ChangeEmailErr(
+                                                    newEmailErr = emailErr,
+                                                    passwordErr = passwordErr,
+                                                    changeEmailErr = changeEmailGeneralErr
+                                                )
+                                                if (changeEmailErr != null) {
+                                                    callback(changeEmailErr)
+                                                } else {
+                                                    callback(null)
                                                 }
                                             }
                                         }
-                                } else {
-                                    Toast.makeText(context, "Error sending verification email: ${emailVerificationTask.exception?.message}", Toast.LENGTH_LONG).show()
-                                    Log.e("error sending verification email", "${emailVerificationTask.exception?.message}")
+
+                                        user.verifyBeforeUpdateEmail(email)
+                                            .addOnCompleteListener { task ->
+                                                if (task.isSuccessful) {
+                                                    if(user.isEmailVerified) {
+                                                        Toast.makeText(context, "Email updated successfully.", Toast.LENGTH_LONG).show()
+                                                    }
+                                                }
+                                            }
+                                    } else {
+                                        Toast.makeText(context, "Error sending verification email: ${emailVerificationTask.exception?.message}", Toast.LENGTH_LONG).show()
+                                        Log.e("error sending verification email", "${emailVerificationTask.exception?.message}")
+                                        changeEmailGeneralErr = "Error sending verification email. Please try again."
+                                        changeEmailErr = ChangeEmailErr(
+                                            newEmailErr = emailErr,
+                                            passwordErr = passwordErr,
+                                            changeEmailErr = changeEmailGeneralErr
+                                        )
+                                        if (changeEmailErr != null) {
+                                            callback(changeEmailErr)
+                                        } else {
+                                            callback(null)
+                                        }
+                                    }
                                 }
+                        } else {
+                            Log.d("Debug", "Incorrect password: ${reauthTask.exception?.message}")
+                            passwordErr = "Incorrect password"
+                            changeEmailErr = ChangeEmailErr(
+                                newEmailErr = emailErr,
+                                passwordErr = passwordErr,
+                                changeEmailErr = changeEmailGeneralErr
+                            )
+                            if (changeEmailErr != null) {
+                                callback(changeEmailErr)
+                            } else {
+                                callback(null)
                             }
-                    } else {
-                        Toast.makeText(context, "Reauthentication failed: ${reauthTask.exception?.message}", Toast.LENGTH_LONG).show()
+                        }
                     }
+                    .addOnFailureListener { exception ->
+                        Log.d("Reauthentication failed", "${exception.message}")
+                        changeEmailGeneralErr = "Reauthentication failed."
+                        changeEmailErr = ChangeEmailErr(
+                            newEmailErr = emailErr,
+                            passwordErr = passwordErr,
+                            changeEmailErr = changeEmailGeneralErr
+                        )
+                        if (changeEmailErr != null) {
+                            callback(changeEmailErr)
+                        } else {
+                            callback(null)
+                        }
+                    }
+            } else {
+                Log.d("Debug", "User not found")
+                changeEmailGeneralErr = "User not found. Please log in again."
+                changeEmailErr = ChangeEmailErr(
+                    newEmailErr = emailErr,
+                    passwordErr = passwordErr,
+                    changeEmailErr = changeEmailGeneralErr
+                )
+                if (changeEmailErr != null) {
+                    callback(changeEmailErr)
+                } else {
+                    callback(null)
                 }
+            }
+        }
+
+        changeEmailErr = ChangeEmailErr(
+            newEmailErr = emailErr,
+            passwordErr = passwordErr,
+            changeEmailErr = changeEmailGeneralErr
+        )
+        if (changeEmailErr != null) {
+            callback(changeEmailErr)
+        } else {
+            callback(null)
         }
     }
 
-    fun changePassword(context: Context, oldpassword: String, newpassword: String, confirmnewpassword: String) {
-        val user = FirebaseAuth.getInstance().currentUser
+    fun changePassword(context: Context, oldpassword: String, newpassword: String, confirmnewpassword: String, callback: (ChangePasswordErr?) -> Unit) {
+        var oldpassword = oldpassword
+        var newpassword = newpassword
+        var confirmnewpassword = confirmnewpassword
+        var changePasswordErr: ChangePasswordErr? = null
+        var oldpasswordErr = ""
+        var newpasswordErr = ""
+        var confirmnewpasswordErr = ""
+        var changePasswordGeneralErr = ""
+        var errCount = 0
+        if(oldpassword == "" || oldpassword == null) {
+            oldpasswordErr = "This field is required"
+            errCount++
+        }
+        if(newpassword == "" || newpassword == null) {
+            newpasswordErr = "This field is required"
+            errCount++
+        } else if(newpassword.length < 8) {
+            newpasswordErr = "Password must have a minimum length of 8 characters."
+            errCount++
+        }
+        if(confirmnewpassword == "" || confirmnewpassword == null) {
+            confirmnewpasswordErr = "This field is required"
+            errCount++
+        } else if(confirmnewpassword != newpassword) {
+            Log.d("Debug", "inside")
+            confirmnewpasswordErr = "New password and confirm new password does not match"
+            errCount++
+        }
 
-        if (user != null) {
-            //Check if new password is same as confirm new password
-            if(newpassword != confirmnewpassword) {
-                Toast.makeText(context, "New password and confirm new password must match", Toast.LENGTH_SHORT).show()
-            } else {
+        if(errCount == 0) {
+            val user = FirebaseAuth.getInstance().currentUser
+
+            if (user != null) {
                 // Reauthenticate the user
                 val credential = EmailAuthProvider.getCredential(user.email!!, oldpassword)
                 user.reauthenticate(credential)
@@ -589,23 +727,93 @@ object DatabaseFunctions {
                                         editor.apply()
                                         context.startActivity(Intent(context, LoginActivity::class.java))
                                     } else {
-                                        Toast.makeText(context, "Error updating password1", Toast.LENGTH_LONG).show()
-                                        Log.d("error updating user password", "${task.exception?.message}")
+                                        Log.d("error updating password: ", "${task.exception?.message}")
+                                        changePasswordGeneralErr = "Error updating password. Please try again."
+                                        changePasswordErr = ChangePasswordErr(
+                                            oldPasswordErr = oldpasswordErr,
+                                            newPasswordErr = newpasswordErr,
+                                            confirmNewPasswordErr = confirmnewpasswordErr,
+                                            changePasswordErr = changePasswordGeneralErr
+                                        )
+                                        if (changePasswordErr != null) {
+                                            callback(changePasswordErr)
+                                        } else {
+                                            callback(null)
+                                        }
                                     }
                                 }
                                 .addOnFailureListener { exception ->
-                                    Toast.makeText(context, "Error updating password2", Toast.LENGTH_LONG).show()
                                     Log.d("Error updating password: ","${exception.message}")
+                                    changePasswordGeneralErr = "Error updating password. Please try again."
+                                    changePasswordErr = ChangePasswordErr(
+                                        oldPasswordErr = oldpasswordErr,
+                                        newPasswordErr = newpasswordErr,
+                                        confirmNewPasswordErr = confirmnewpasswordErr,
+                                        changePasswordErr = changePasswordGeneralErr
+                                    )
+                                    if (changePasswordErr != null) {
+                                        callback(changePasswordErr)
+                                    } else {
+                                        callback(null)
+                                    }
                                 }
                         } else {
                             Log.d("Incorrect Pasword: ", "${reauthTask.exception?.message}")
+                            oldpasswordErr = "Incorrect password"
+                            changePasswordErr = ChangePasswordErr(
+                                oldPasswordErr = oldpasswordErr,
+                                newPasswordErr = newpasswordErr,
+                                confirmNewPasswordErr = confirmnewpasswordErr,
+                                changePasswordErr = changePasswordGeneralErr
+                            )
+                            if (changePasswordErr != null) {
+                                callback(changePasswordErr)
+                            } else {
+                                callback(null)
+                            }
                         }
                     }
                     .addOnFailureListener { exception ->
-                        Toast.makeText(context, "Incorrect password", Toast.LENGTH_SHORT).show()
-                        Log.d("reauthentication failed", "${exception.message}")
+                        Log.d("Reauthentication failed", "${exception.message}")
+                        changePasswordGeneralErr = "Reauthentication failed."
+                        changePasswordErr = ChangePasswordErr(
+                            oldPasswordErr = oldpasswordErr,
+                            newPasswordErr = newpasswordErr,
+                            confirmNewPasswordErr = confirmnewpasswordErr,
+                            changePasswordErr = changePasswordGeneralErr
+                        )
+                        if (changePasswordErr != null) {
+                            callback(changePasswordErr)
+                        } else {
+                            callback(null)
+                        }
                     }
+            } else {
+                changePasswordGeneralErr = "User not found. Please log in again."
+                changePasswordErr = ChangePasswordErr(
+                    oldPasswordErr = oldpasswordErr,
+                    newPasswordErr = newpasswordErr,
+                    confirmNewPasswordErr = confirmnewpasswordErr,
+                    changePasswordErr = changePasswordGeneralErr
+                )
+                if (changePasswordErr != null) {
+                    callback(changePasswordErr)
+                } else {
+                    callback(null)
+                }
             }
+        }
+
+        changePasswordErr = ChangePasswordErr(
+            oldPasswordErr = oldpasswordErr,
+            newPasswordErr = newpasswordErr,
+            confirmNewPasswordErr = confirmnewpasswordErr,
+            changePasswordErr = changePasswordGeneralErr
+        )
+        if (changePasswordErr != null) {
+            callback(changePasswordErr)
+        } else {
+            callback(null)
         }
     }
 
@@ -625,28 +833,75 @@ object DatabaseFunctions {
         }
     }
 
-    fun changeUsername(context: Context, newUsername: String) {
-        val user = FirebaseAuth.getInstance().currentUser
+    fun changeUsername(context: Context, newUsername: String, callback: (ChangeUsernameErr?) -> Unit) {
+        var newUsername = newUsername
+        var changeUsernameErr: ChangeUsernameErr? = null
+        var usernameErr = ""
+        var changeUsernameGeneralErr = ""
+        var errCount = 0
+        if(newUsername == "" || newUsername == null) {
+            usernameErr = "This field is required"
+            errCount++
+        }
 
-        if (user != null) {
-            val userDocumentRef = db.collection("users").document(user.uid)
+        if(errCount == 0) {
+            val user = FirebaseAuth.getInstance().currentUser
+            if (user != null) {
+                val userDocumentRef = db.collection("users").document(user.uid)
 
-            checkUsernameUnique(newUsername) { isUnique ->
-                if (isUnique) {
-                    userDocumentRef.update("userDetails.username", newUsername)
-                        .addOnSuccessListener {
-                            Toast.makeText(context, "Username updated successfully.", Toast.LENGTH_SHORT).show()
+                checkUsernameUnique(newUsername) { isUnique ->
+                    if (isUnique) {
+                        userDocumentRef.update("userDetails.username", newUsername)
+                            .addOnSuccessListener {
+                                Toast.makeText(context, "Username updated successfully.", Toast.LENGTH_SHORT).show()
+                            }
+                            .addOnFailureListener { e ->
+                                Log.e("EditUsername", "Error updating username", e)
+                                changeUsernameGeneralErr = "Error updating username. Please try again."
+                                changeUsernameErr = ChangeUsernameErr(
+                                    usernameErr = usernameErr,
+                                    changeUsernameErr = changeUsernameGeneralErr
+                                )
+                                if (changeUsernameErr != null) {
+                                    callback(changeUsernameErr)
+                                } else {
+                                    callback(null)
+                                }
+                            }
+                    } else {
+                        usernameErr = "Username is not unique"
+                        changeUsernameErr = ChangeUsernameErr(
+                            usernameErr = usernameErr,
+                            changeUsernameErr = changeUsernameGeneralErr
+                        )
+                        if (changeUsernameErr != null) {
+                            callback(changeUsernameErr)
+                        } else {
+                            callback(null)
                         }
-                        .addOnFailureListener { e ->
-                            Log.e("EditUsername", "Error updating username", e)
-                            Toast.makeText(context, "Failed to update username.", Toast.LENGTH_SHORT).show()
-                        }
+                    }
+                }
+            } else {
+                changeUsernameGeneralErr = "User not found. Please log in again."
+                changeUsernameErr = ChangeUsernameErr(
+                    usernameErr = usernameErr,
+                    changeUsernameErr = changeUsernameGeneralErr
+                )
+                if (changeUsernameErr != null) {
+                    callback(changeUsernameErr)
                 } else {
-                    Toast.makeText(context, "Username is not unique.", Toast.LENGTH_SHORT).show()
+                    callback(null)
                 }
             }
+        }
+        changeUsernameErr = ChangeUsernameErr(
+            usernameErr = usernameErr,
+            changeUsernameErr = changeUsernameGeneralErr
+        )
+        if (changeUsernameErr != null) {
+            callback(changeUsernameErr)
         } else {
-            Toast.makeText(context, "User not found.", Toast.LENGTH_SHORT).show()
+            callback(null)
         }
     }
 
@@ -756,7 +1011,7 @@ object DatabaseFunctions {
                             Log.i("Firestore", "User document deleted successfully")
                             user.delete()
                                 .addOnSuccessListener {
-                                    Toast.makeText(context, "User deleted.", Toast.LENGTH_LONG).show()
+                                    Toast.makeText(context, "User deleted.", Toast.LENGTH_SHORT).show()
                                     context.startActivity(Intent(context, LoginActivity::class.java))
                                 }
                                 .addOnFailureListener { e ->
@@ -775,7 +1030,7 @@ object DatabaseFunctions {
             }
         } else {
             Log.e("Error", "User not found.")
-            Toast.makeText(context, "Error deleting user.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "User not found. Please log in again.", Toast.LENGTH_LONG).show()
         }
     }
 

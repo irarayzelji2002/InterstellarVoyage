@@ -38,8 +38,16 @@ class EditUserInfoActivity : AppCompatActivity() {
         val editTextConfirmNewPassword = findViewById<EditText>(R.id.editTextConfirmNewPassword)
 
         val usernameErr = findViewById<TextView>(R.id.usernameErr)
+        val changeUsernameErr = findViewById<TextView>(R.id.changeUsernameErr)
+
         val emailAddressErr = findViewById<TextView>(R.id.emailAddressErr)
         val passwordErr = findViewById<TextView>(R.id.passwordErr)
+        val changeEmailAddressErr = findViewById<TextView>(R.id.changeEmailAddressErr)
+
+        val oldPasswordErr = findViewById<TextView>(R.id.oldPasswordErr)
+        val newPasswordErr = findViewById<TextView>(R.id.newPasswordErr)
+        val confirmNewPasswordErr = findViewById<TextView>(R.id.confirmNewPasswordErr)
+        val changePasswordErr = findViewById<TextView>(R.id.changePasswordErr)
 
         // Add Username & Populate Username and Email Address Text Fields
         DatabaseFunctions.accessUserDocument(this) { userDocument ->
@@ -53,19 +61,21 @@ class EditUserInfoActivity : AppCompatActivity() {
                 val username : String = dbUsername.toString()
                 val dbEmailAdd: String? = userDocument.userDetails?.email
                 val emailAdd : String = dbEmailAdd.toString()
-                if (currentLevel == 0) {
+                if (currentLevel == 0) { //iron
                     goldUser.visibility = View.GONE
                     ironUser.visibility = View.VISIBLE
                     txtUsernameIron.text = username
-                } else if (currentLevel == 1) {
+                } else if (currentLevel == 1) { //bronze
                     goldUser.visibility = View.GONE
                     bronzeUser.visibility = View.VISIBLE
                     txtUsernameBronze.text = username
-                } else if (currentLevel == 2) {
+                } else if (currentLevel == 2) { //silver
                     goldUser.visibility = View.GONE
                     silverUser.visibility = View.VISIBLE
                     txtUsernameSilver.text = username
-                } else if (currentLevel == 3) {
+                } else if (currentLevel >= 3) { //gold
+                    txtUsernameGold.text = username
+                } else if (currentLevel == 4) { //gold
                     txtUsernameGold.text = username
                 }
                 editTextUsername.setText(username)
@@ -79,20 +89,68 @@ class EditUserInfoActivity : AppCompatActivity() {
 
         btnChangeUsername.setOnClickListener {
             val newUsername = editTextUsername.text.toString()
-            DatabaseFunctions.changeUsername(this, newUsername)
+            DatabaseFunctions.changeUsername(this, newUsername) { errors ->
+                if(errors != null) {
+                    Log.d("Error", "Username: ${errors.usernameErr}")
+                    Log.d("Error", "Change Username: ${errors.changeUsernameErr}")
+
+                    if(errors.usernameErr != "") {
+                        setErrorTextAndVisibility(usernameErr, errors.usernameErr)
+                    } else {
+                        setErrorTextAndVisibility(changeUsernameErr, errors.changeUsernameErr)
+                    }
+                }
+            }
         }
 
         btnChangeEmailAdd.setOnClickListener {
             val newEmail = editTextEmailAddress.text.toString()
             val password = editTextPassword.text.toString()
-            DatabaseFunctions.changeEmailAdd(this, newEmail, password)
+            DatabaseFunctions.changeEmailAdd(this, newEmail, password) { errors ->
+                if(errors != null) {
+                    Log.d("Error", "Email: ${errors.newEmailErr}")
+                    Log.d("Error", "Password: ${errors.passwordErr}")
+                    Log.d("Error", "Change Email: ${errors.changeEmailErr}")
+
+                    if(errors.newEmailErr != "" || errors.passwordErr != "") {
+                        setErrorTextAndVisibility(emailAddressErr, errors.newEmailErr)
+                        setErrorTextAndVisibility(passwordErr, errors.passwordErr)
+                    } else {
+                        setErrorTextAndVisibility(changeEmailAddressErr, errors.changeEmailErr)
+                    }
+                }
+            }
         }
 
         btnChangePassword.setOnClickListener {
             val oldPassword = editTextOldPassword.text.toString()
             val newPassword = editTextNewPassword.text.toString()
             val confirmNewPassword = editTextConfirmNewPassword.text.toString()
-            DatabaseFunctions.changePassword(this, oldPassword, newPassword, confirmNewPassword)
+            DatabaseFunctions.changePassword(this, oldPassword, newPassword, confirmNewPassword) { errors ->
+                if(errors != null) {
+                    Log.d("Error", "Old Password: ${errors.oldPasswordErr}")
+                    Log.d("Error", "New Password: ${errors.newPasswordErr}")
+                    Log.d("Error", "Confirm New Password: ${errors.confirmNewPasswordErr}")
+                    Log.d("Error", "Change Password: ${errors.changePasswordErr}")
+
+                    if(errors.oldPasswordErr != "" || errors.newPasswordErr != "" || errors.confirmNewPasswordErr != "") {
+                        setErrorTextAndVisibility(oldPasswordErr, errors.oldPasswordErr)
+                        setErrorTextAndVisibility(newPasswordErr, errors.newPasswordErr)
+                        setErrorTextAndVisibility(confirmNewPasswordErr, errors.confirmNewPasswordErr)
+                    } else {
+                        setErrorTextAndVisibility(changePasswordErr, errors.changePasswordErr)
+                    }
+                }
+            }
+        }
+    }
+
+    fun setErrorTextAndVisibility(view: TextView, error: String) {
+        if (error.isNotEmpty() && error != null) {
+            view.visibility = View.VISIBLE
+            view.text = error
+        } else {
+            view.visibility = View.GONE
         }
     }
 }
