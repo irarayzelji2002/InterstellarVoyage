@@ -1056,7 +1056,7 @@ object DatabaseFunctions {
                         //update in database
                         userDocumentRef.update(updatedDataMap)
                             .addOnSuccessListener {
-                                Toast.makeText(context, "User updated successfully.", Toast.LENGTH_LONG).show()
+                                //Toast.makeText(context, "User updated successfully.", Toast.LENGTH_LONG).show()
                             }
                             .addOnFailureListener { e ->
                                 Log.e(ContentValues.TAG, "Error updating user document: $e")
@@ -1094,7 +1094,7 @@ object DatabaseFunctions {
                         //update in database
                         userDocumentRef.update(updatedDataMap)
                             .addOnSuccessListener {
-                                Toast.makeText(context, "User updated successfully.", Toast.LENGTH_LONG).show()
+                                //Toast.makeText(context, "User updated successfully.", Toast.LENGTH_LONG).show()
                             }
                             .addOnFailureListener { e ->
                                 Log.e(ContentValues.TAG, "Error updating user document: $e")

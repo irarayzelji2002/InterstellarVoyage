@@ -252,22 +252,6 @@
             android:textColor="#fff0cc"/>
     </LinearLayout>
 
-    <!--OPTIONS BUTTON-->
-    <ImageButton
-        android:id="@+id/btnOptions"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:background="@drawable/blue_button_icon"
-        android:backgroundTint="@null"
-        android:padding="28dp"
-        android:scaleType="fitCenter"
-        android:contentDescription="Options"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_options"
-        android:layout_marginTop="3dp"
-        android:layout_marginRight="3dp"/>
-
     <!--CLICKS INFO-->
     <LinearLayout
         android:id="@+id/clicksContainer"
@@ -419,5 +403,55 @@
             android:layout_marginBottom="-6dp"
             android:layout_marginRight="-5dp"/>
     </RelativeLayout>
+
+    <!--COUNTDOWN-->
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/CountdownBG"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:duplicateParentState="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:lottie_autoPlay="true"
+        app:lottie_rawRes="@raw/two_countdown"
+        app:lottie_loop="false"
+        android:scaleType="centerCrop"
+        tools:ignore="MissingConstraints"
+        android:visibility="visible"/>
+
+    <!--COMPLETED LEVELS BACKGROUND-->
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/CompletedLevelsBG"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:duplicateParentState="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:lottie_autoPlay="true"
+        app:lottie_rawRes="@raw/two_four_level_completed_bg"
+        app:lottie_loop="true"
+        android:scaleType="centerCrop"
+        tools:ignore="MissingConstraints"
+        android:visibility="gone"/>
+
+    <!--OPTIONS BUTTON-->
+    <ImageButton
+        android:id="@+id/btnOptions"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:background="@drawable/blue_button_icon"
+        android:backgroundTint="@null"
+        android:padding="28dp"
+        android:scaleType="fitCenter"
+        android:contentDescription="Options"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_options"
+        android:layout_marginTop="3dp"
+        android:layout_marginRight="3dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
