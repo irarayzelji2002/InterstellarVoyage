@@ -1,9 +1,14 @@
 package com.example.interstellarvoyage
 
 import android.annotation.SuppressLint
+import android.app.ActivityManager
+import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.IBinder
 import android.util.Log
 import android.view.View
 import android.widget.Button
@@ -16,11 +21,47 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import java.util.concurrent.CompletableFuture
 
-class LeaderboardActivity : AppCompatActivity() {
+class LeaderboardActivity : AppCompatActivity(), MusicPlayerCallback {
+    private lateinit var musicPlayer: MusicPlayer
+    private var bound = false
+    private var serviceConnected = false
+    private var isMusicServiceBound = false
+
+    private val connection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            val binder = service as MusicPlayer.MusicBinder
+            musicPlayer = binder.getService()
+            bound = true
+            serviceConnected = true
+            Log.i("Music", "Service Connected")
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            bound = false
+            serviceConnected = false
+            Log.e("Music", "Service Disconnected")
+        }
+    }
+
     @SuppressLint("WrongViewCast")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_leaderboard)
+
+        val playIntent = Intent(this, MusicPlayer::class.java)
+        playIntent.action = MusicPlayer.ACTION_PLAY_MUSIC
+        playIntent.putExtra(MusicPlayer.EXTRA_MUSIC_RESOURCE_ID, R.raw.homepage_music)
+
+        if (!isServiceRunning(MusicPlayer::class.java)) {
+            startService(playIntent)
+        }
+
+        if (!isMusicServiceBound && bindService(playIntent, connection, Context.BIND_AUTO_CREATE)) {
+            Log.i("Music", "Service binding successful")
+            isMusicServiceBound = true
+        } else {
+            Log.e("Music", "Service binding failed")
+        }
 
         val btnBack = findViewById<Button>(R.id.btnBack)
 
@@ -352,6 +393,73 @@ class LeaderboardActivity : AppCompatActivity() {
                     }
                 }
             }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        bindService(intent, connection, Context.BIND_AUTO_CREATE)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        if (bound) {
+            unbindService(connection)
+            bound = false
+        }
+    }
+    override fun onPause() {
+        super.onPause()
+        if (bound) {
+            unbindService(connection)
+            bound = false
+            serviceConnected = false
+        }
+    }
+
+    fun isServiceRunning(serviceClass: Class<*>): Boolean {
+        val manager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        for (service in manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.name == service.service.className) {
+                return true
+            }
+        }
+        return false
+    }
+
+    // MusicPlayerCallback functions
+    override fun playMusic() {
+        if (::musicPlayer.isInitialized) {
+            musicPlayer?.playMusic()
+            Log.i("Music", "Playing")
+        } else {
+            Log.e("Music", "MusicPlayer not initialized")
+        }
+    }
+
+    override fun pauseMusic() {
+        if (::musicPlayer.isInitialized) {
+            musicPlayer?.pauseMusic()
+            Log.i("Music", "Paused")
+        } else {
+            Log.e("Music", "MusicPlayer not initialized")
+        }
+    }
+
+    override fun isPlaying(): Boolean {
+        return if (::musicPlayer.isInitialized) {
+            musicPlayer.isPlaying()
+        } else {
+            false
+        }
+    }
+
+    override fun changeMusic(newMusicResourceId: Int) {
+        if (::musicPlayer.isInitialized) {
+            musicPlayer?.changeMusic(newMusicResourceId)
+            Log.i("Music", "Changed")
+        } else {
+            Log.e("Music", "MusicPlayer not initialized")
         }
     }
 }

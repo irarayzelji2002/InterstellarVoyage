@@ -69,7 +69,8 @@
                 app:lottie_rawRes="@raw/two_zero_person"
                 app:lottie_loop="true"
                 android:layout_marginBottom="60dp"
-                android:layout_marginRight="10dp"/>
+                android:layout_marginRight="10dp"
+                android:soundEffectsEnabled="false" />
         </RelativeLayout>
     </RelativeLayout>
 
@@ -107,7 +108,8 @@
                 app:lottie_rawRes="@raw/two_one_spaceship"
                 app:lottie_loop="true"
                 android:scaleType="centerInside"
-                android:layout_marginBottom="-33dp"/>
+                android:layout_marginBottom="-33dp"
+                android:soundEffectsEnabled="false"/>
         </RelativeLayout>
     </RelativeLayout>
 
@@ -145,7 +147,8 @@
                 app:lottie_rawRes="@raw/two_two_scan_button"
                 android:scaleType="centerInside"
                 android:paddingTop="10dp"
-                android:layout_marginBottom="92dp" />
+                android:layout_marginBottom="92dp"
+                android:soundEffectsEnabled="false"/>
         </RelativeLayout>
     </RelativeLayout>
 
@@ -206,7 +209,8 @@
                 app:lottie_rawRes="@raw/two_three_person"
                 app:lottie_loop="true"
                 android:layout_marginBottom="60dp"
-                android:layout_marginRight="10dp"/>
+                android:layout_marginRight="10dp"
+                android:soundEffectsEnabled="false"/>
         </RelativeLayout>
     </RelativeLayout>
 

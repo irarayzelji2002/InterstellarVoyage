@@ -1,13 +1,28 @@
 package com.example.interstellarvoyage
 
-import android.media.MediaPlayer
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
+import android.app.ActivityManager
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
+import android.graphics.drawable.AnimationDrawable
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.os.IBinder
 import android.util.Log
 import android.view.View
+import android.view.ViewGroup
+import android.view.animation.AccelerateDecelerateInterpolator
+import android.view.animation.DecelerateInterpolator
 import android.widget.Button
+import android.widget.FrameLayout
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -17,7 +32,11 @@ import com.example.interstellarvoyage.DatabaseFunctions.subMissionCompleted
 import com.example.interstellarvoyage.GameFunctions.getNextCurrentMissionAfterLevel
 
 class GameActivity : AppCompatActivity(), MusicPlayerCallback {
-    private var mediaPlayer: MediaPlayer? = null
+    private lateinit var musicPlayer: MusicPlayer
+    private lateinit var popSound: MusicPlayer
+    private var bound = false
+    private var serviceConnected = false
+    var isBeatAnimationRunning = false
 
     var Clicks: Int = 0
     var ClicksperSecond: Float = 0.0F
@@ -35,9 +54,64 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback {
     private var countdownTimer: CountDownTimer? = null
     private val countdownDuration = 500 // Change this to the desired number of clicks
 
+    private val connection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            val binder = service as MusicPlayer.MusicBinder
+            musicPlayer = binder.getService()
+            bound = true
+            serviceConnected = true
+
+            Log.i("Music", "Service Connected")
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            bound = false
+            serviceConnected = false
+            Log.e("Music", "Service Disconnected")
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game)
+
+        val playIntent = Intent(this, MusicPlayer::class.java)
+        playIntent.action = MusicPlayer.ACTION_PLAY_MUSIC
+
+        DatabaseFunctions.accessUserDocument(this) { userDocument ->
+            if (userDocument != null) {
+                // Select music
+                Log.d("FirestoreData", "Current Level: ${userDocument.currentLevel}")
+                val dbCurrentLevel: Long? = userDocument.currentLevel
+                val currentLevel: Int = dbCurrentLevel?.toInt() ?: 0
+
+                // Change music to user's level
+                if (serviceConnected) {
+                    changeLevelMusic(currentLevel)
+                    if(currentLevel==0) {
+                        playIntent.putExtra(MusicPlayer.EXTRA_MUSIC_RESOURCE_ID, R.raw.level0_music)
+                    } else if(currentLevel==1) {
+                        playIntent.putExtra(MusicPlayer.EXTRA_MUSIC_RESOURCE_ID, R.raw.level1_music)
+                    } else if(currentLevel==2) {
+                        playIntent.putExtra(MusicPlayer.EXTRA_MUSIC_RESOURCE_ID, R.raw.level2_music)
+                    } else if(currentLevel==3) {
+                        playIntent.putExtra(MusicPlayer.EXTRA_MUSIC_RESOURCE_ID, R.raw.level3_music)
+                    } else if(currentLevel==4) {
+                        playIntent.putExtra(MusicPlayer.EXTRA_MUSIC_RESOURCE_ID, R.raw.level3_music)
+                    } else {
+                        playIntent.putExtra(MusicPlayer.EXTRA_MUSIC_RESOURCE_ID, R.raw.level0_music)
+                    }
+                }
+            }
+        }
+        startService(playIntent)
+        if (bindService(playIntent, connection, Context.BIND_AUTO_CREATE)) {
+            Log.i("Music", "Service binding successful")
+        } else {
+            Log.e("Music", "Service binding failed")
+        }
+
+        popSound = MusicPlayer()
 
         // Click related
         // hide levelXGraphics if not in the level (e.g. level0Graphics.visibility = View.GONE/VISIBLE)
@@ -67,12 +141,6 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback {
         // Populate activity info from database
         DatabaseFunctions.accessUserDocument(this) { userDocument ->
             if (userDocument != null) {
-                // Select music
-                Log.d("FirestoreData", "Current Level: ${userDocument.currentLevel}")
-                val dbCurrentLevel: Long? = userDocument.currentLevel
-                val currentLevel: Int = dbCurrentLevel?.toInt() ?: 0
-                changeMusic(currentLevel)
-
                 // Store Click & Duration to local variable
                 val dBsecondsRemaining  = userDocument.currentDuration
                 secondsRemaining = dBsecondsRemaining?.toInt()?: 0
@@ -162,6 +230,9 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback {
         // LEVEL 0; 500 clicks (100/sub mission); Earth’s Great Dilemma
         btnLevel0Clicker.setOnClickListener(object : View.OnClickListener {
             override fun onClick(view: View) {
+                popSound?.playPopSound(this@GameActivity)
+                startBeatAnimation(btnLevel0Clicker)
+
                 Clicks +=5;
                 txtClicks.text = Clicks.toString();
 
@@ -234,6 +305,8 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback {
         // LEVEL 1; 1000 (200/sub mission); Search for New Habitat
         btnLevel1Clicker.setOnClickListener(object : View.OnClickListener {
             override fun onClick(view: View) {
+                popSound?.playPopSound(this@GameActivity)
+                startBeatAnimation(btnLevel1Clicker)
                 Toast.makeText(this@GameActivity,"Level 1 CLicker clicked", Toast.LENGTH_SHORT)
             }
         })
@@ -241,6 +314,8 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback {
         // LEVEL 2; 1000 (200/sub mission); Beacon in the Galaxy
         btnLevel2Clicker.setOnClickListener(object : View.OnClickListener {
             override fun onClick(view: View) {
+                popSound?.playPopSound(this@GameActivity)
+                startBeatAnimation(btnLevel2Clicker)
                 Toast.makeText(this@GameActivity,"Level 2 CLicker clicked", Toast.LENGTH_SHORT)
             }
         })
@@ -248,6 +323,8 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback {
         // LEVEL 3; 2000 (400/sub mission); The Cosmic Council
         btnLevel3Clicker.setOnClickListener(object : View.OnClickListener {
             override fun onClick(view: View) {
+                popSound?.playPopSound(this@GameActivity)
+                startBeatAnimation(btnLevel3Clicker)
                 Toast.makeText(this@GameActivity,"Level 3 CLicker clicked", Toast.LENGTH_SHORT)
             }
         })
@@ -266,61 +343,140 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback {
 
     override fun onDestroy() {
         super.onDestroy()
-        mediaPlayer?.release()
+        if (bound) {
+            unbindService(connection)
+            bound = false
+        }
     }
 
+    override fun onStop() {
+        super.onStop()
+        if (bound) {
+            unbindService(connection)
+            bound = false
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        bindService(intent, connection, Context.BIND_AUTO_CREATE)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if (bound) {
+            unbindService(connection)
+            bound = false
+            serviceConnected = false
+        }
+    }
+
+    // MusicPlayerCallback functions
     override fun playMusic() {
-        mediaPlayer?.start()
+        if (::musicPlayer.isInitialized) {
+            musicPlayer?.playMusic()
+            Log.i("Music", "Playing")
+        } else {
+            Log.e("Music", "MusicPlayer not initialized")
+        }
     }
 
     override fun pauseMusic() {
-        mediaPlayer?.pause()
+        if (::musicPlayer.isInitialized) {
+            musicPlayer?.pauseMusic()
+            Log.i("Music", "Paused")
+        } else {
+            Log.e("Music", "MusicPlayer not initialized")
+        }
     }
 
     override fun isPlaying(): Boolean {
-        return mediaPlayer?.isPlaying ?: false
-    }
-
-    override fun transitionMusic(activity: String) {
-        mediaPlayer?.release()
-        if(activity=="homepage") {
-            mediaPlayer = MediaPlayer.create(this, R.raw.level0_music)
-        }
-        mediaPlayer?.isLooping = true
-        mediaPlayer?.setVolume(1.0f, 1.0f)
-        val userPref = getSharedPreferences("UserPrefs", MODE_PRIVATE)
-        val isMusicEnabled = userPref.getBoolean("isMusicEnabled", true)
-        if(isMusicEnabled) {
-            playMusic()
+        return if (::musicPlayer.isInitialized) {
+            musicPlayer.isPlaying()
         } else {
-            if (mediaPlayer?.isPlaying == true) {
-                pauseMusic()
-            }
+            false
         }
     }
 
-    fun changeMusic(currentLevel: Int) {
-        mediaPlayer?.release()
+    override fun changeMusic(newMusicResourceId: Int) {
+        if (::musicPlayer.isInitialized) {
+            musicPlayer?.changeMusic(newMusicResourceId)
+            Log.i("Music", "Changed")
+        } else {
+            Log.e("Music", "MusicPlayer not initialized")
+        }
+    }
+
+    // Game Activity Functions
+    fun changeLevelMusic(currentLevel: Int) {
+        musicPlayer?.release()
         if(currentLevel==0) {
-            mediaPlayer = MediaPlayer.create(this, R.raw.level0_music)
+            changeMusic(R.raw.level0_music)
         } else if(currentLevel==1) {
-            mediaPlayer = MediaPlayer.create(this, R.raw.level1_music)
+            changeMusic(R.raw.level1_music)
         } else if(currentLevel==2) {
-            mediaPlayer = MediaPlayer.create(this, R.raw.level2_music)
+            changeMusic(R.raw.level2_music)
         } else if(currentLevel==3) {
-            mediaPlayer = MediaPlayer.create(this, R.raw.level3_music)
+            changeMusic(R.raw.level3_music)
+        } else if(currentLevel==4) {
+            changeMusic(R.raw.level3_music)
         }
-        mediaPlayer?.isLooping = true
-        mediaPlayer?.setVolume(1.0f, 1.0f)
+        musicPlayer?.setVolume(1.0f, 1.0f)
         val userPref = getSharedPreferences("UserPrefs", MODE_PRIVATE)
         val isMusicEnabled = userPref.getBoolean("isMusicEnabled", true)
         if(isMusicEnabled) {
             playMusic()
         } else {
-            if (mediaPlayer?.isPlaying == true) {
+            if (isPlaying()) {
                 pauseMusic()
             }
         }
     }
+
+    private fun isServiceRunning(serviceClass: Class<*>): Boolean {
+        val manager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        for (service in manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.name == service.service.className) {
+                return true
+            }
+        }
+        return false
+    }
+
+    private fun startBeatAnimation(lottieView: LottieAnimationView) {
+        if (!isBeatAnimationRunning) {
+            isBeatAnimationRunning = true
+            // Scale up animation
+            val scaleUpX = ObjectAnimator.ofFloat(lottieView, View.SCALE_X, 1.0f, 1.1f)
+            val scaleUpY = ObjectAnimator.ofFloat(lottieView, View.SCALE_Y, 1.0f, 1.1f)
+            // Scale down animation
+            val scaleDownX = ObjectAnimator.ofFloat(lottieView, View.SCALE_X, 1.1f, 1.0f)
+            val scaleDownY = ObjectAnimator.ofFloat(lottieView, View.SCALE_Y, 1.1f, 1.0f)
+            // Create the animation sets
+            val scaleUp = AnimatorSet().apply {
+                play(scaleUpX).with(scaleUpY)
+                duration = 100
+                interpolator = AccelerateDecelerateInterpolator()
+            }
+            val scaleDown = AnimatorSet().apply {
+                play(scaleDownX).with(scaleDownY)
+                duration = 100
+                interpolator = AccelerateDecelerateInterpolator()
+            }
+            // Create the final animation set
+            val scaleAnimation = AnimatorSet().apply {
+                playSequentially(scaleUp, scaleDown)
+            }
+            // Start the animations
+            scaleAnimation.start()
+            // Add a listener to reset the flag when the animation is finished
+            scaleAnimation.addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    isBeatAnimationRunning = false
+                }
+            })
+        }
+    }
+
     // Don't delete below this
 }

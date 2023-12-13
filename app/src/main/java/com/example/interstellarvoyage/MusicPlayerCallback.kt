@@ -4,5 +4,5 @@ interface MusicPlayerCallback {
     fun playMusic()
     fun pauseMusic()
     fun isPlaying(): Boolean
-    fun transitionMusic(activity: String)
+    fun changeMusic(newMusicResourceId: Int)
 }
