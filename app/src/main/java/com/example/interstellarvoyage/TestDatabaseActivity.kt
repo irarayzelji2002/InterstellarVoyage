@@ -77,24 +77,11 @@ class TestDatabaseActivity : AppCompatActivity() {
         }
 
         btnChangeEmailAdd.setOnClickListener {
-            DatabaseFunctions.changeEmailAdd(this, "irarayzelji@gmail.com", "irarayzelji") { errors ->
-                if(errors != null) {
-                    Log.d("Error", "Email: ${errors.newEmailErr}")
-                    Log.d("Error", "Password: ${errors.passwordErr}")
-                    Log.d("Error", "Change Email: ${errors.changeEmailErr}")
-                }
-            }
+            DatabaseFunctions.changeEmailAdd(this, "irarayzelji@gmail.com", "irarayzelji")
         }
 
         btnChangePassword.setOnClickListener {
-            DatabaseFunctions.changePassword(this, "irarayzelji", "irarayzelji2002", "irarayzelji2002") { errors ->
-                if (errors != null) {
-                    Log.d("Error", "Old Password: ${errors.oldPasswordErr}")
-                    Log.d("Error", "New Password: ${errors.newPasswordErr}")
-                    Log.d("Error", "Confirm New Password: ${errors.confirmNewPasswordErr}")
-                    Log.d("Error", "Change Password: ${errors.changePasswordErr}")
-                }
-            }
+            DatabaseFunctions.changePassword(this, "irarayzelji", "irarayzelji2002", "irarayzelji2002")
         }
 
         btnForgotPassword.setOnClickListener {
@@ -102,12 +89,7 @@ class TestDatabaseActivity : AppCompatActivity() {
         }
 
         btnChangeUsername.setOnClickListener {
-            DatabaseFunctions.changeUsername(this, "myNewUsername") { errors ->
-                if(errors != null) {
-                    Log.d("Error", "Username: ${errors.usernameErr}")
-                    Log.d("Error", "Change Username: ${errors.changeUsernameErr}")
-                }
-            }
+            DatabaseFunctions.changeUsername(this, "myNewUsername")
         }
 
         btnLogout.setOnClickListener {

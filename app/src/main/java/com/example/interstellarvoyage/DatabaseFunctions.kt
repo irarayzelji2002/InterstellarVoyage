@@ -324,7 +324,7 @@ object DatabaseFunctions {
 
                                                 userDocumentRef.set(userData)
                                                     .addOnSuccessListener {
-                                                        Toast.makeText(context, "Account created, please log in.", Toast.LENGTH_LONG).show()
+                                                        //Toast.makeText(context, "Account created, please log in.", Toast.LENGTH_LONG).show()
                                                         context.startActivity(Intent(context, LoginActivity::class.java))
                                                     }
                                                     .addOnFailureListener { e ->
@@ -1443,6 +1443,18 @@ object DatabaseFunctions {
         } else {
             Toast.makeText(context, "User not found.", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    fun changeEmailAdd(context: TestDatabaseActivity, email: String, password: String) {
+
+    }
+
+    fun changeUsername(context: TestDatabaseActivity, newUsername: String) {
+
+    }
+
+    fun changePassword(context: TestDatabaseActivity, oldpassword: String, newpassword: String, confirmnewpassword: String) {
+
     }
     // Don't delete below this
 }

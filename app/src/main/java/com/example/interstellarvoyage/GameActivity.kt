@@ -40,16 +40,19 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback {
 
     var Clicks: Int = 0
     var ClicksperSecond: Float = 0.0F
-    var Buffer: Int = 0
 
     var MissionReq: Int = 0
     var TotalMissionClicks: Int = 0;
     var startTime = 0.0f
 
+    var buffer: Int = 0
+
+
     private var lastClickTime: Long = 0
     private var clicksInCurrentSecond: Int = 0
 
-    var secondsRemaining = 0;
+    private var remainingSeconds: Long = 0
+    private var remainingTime: Long = remainingSeconds.toLong()
 
     private var countdownTimer: CountDownTimer? = null
     private val countdownDuration = 500 // Change this to the desired number of clicks
@@ -138,12 +141,17 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback {
         // Options Button
         var btnOptions : ImageButton = findViewById(R.id.btnOptions)
 
+/*
+
+        var lvlCompleted: Button = findViewById(R.id.lvlComplete)
+*/
+
         // Populate activity info from database
         DatabaseFunctions.accessUserDocument(this) { userDocument ->
             if (userDocument != null) {
                 // Store Click & Duration to local variable
                 val dBsecondsRemaining  = userDocument.currentDuration
-                secondsRemaining = dBsecondsRemaining?.toInt()?: 0
+                remainingTime = dBsecondsRemaining?.toLong()?: 0
                 val dbNumofClicks = userDocument.numberOfClicks
                 Clicks = dbNumofClicks?.toInt()?: 0
 
@@ -185,20 +193,28 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback {
             }
         }
 
+
+
+
+
         //Timer
         fun startCountdownTimer() {
             countdownTimer = object : CountDownTimer(600000L, 1000L) {
                 override fun onTick(millisUntilFinished: Long) {
                     // Update the timer display on each tick
-                    val secondsRemaining = millisUntilFinished / 1000
+                    val secondsRemaining = (600000 - millisUntilFinished) / 1000
                     val minutes = secondsRemaining / 60
                     val seconds = secondsRemaining % 60
                     txtTime.text = String.format("%02d:%02d", minutes, seconds)
+
+
+                    remainingTime= (600000 - millisUntilFinished)/1000
                 }
 
                 override fun onFinish() {
                     // Countdown is complete, update UI accordingly
                     txtTime.text = "Countdown Complete"
+
                 }
             }
             countdownTimer?.start()
@@ -208,24 +224,49 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback {
             countdownTimer?.cancel()
         }
 
-        //Clicks Per Second.
-        fun calculateCPS() {
+        //Clicks Per Seconds
+
+        // Define a constant for the minimum click interval (in milliseconds)
+         val MIN_CLICK_INTERVAL = 10 // Adjust this value as needed
+
+        fun calculateCPS(): Float {
             val currentTimeMillis = System.currentTimeMillis()
+            val elapsedTime = currentTimeMillis - lastClickTime
 
-            // Check if one second has passed since the last click
-            if (currentTimeMillis - lastClickTime >= 1000) {
-                // Calculate CPS
-                ClicksperSecond = clicksInCurrentSecond.toFloat()
-                txtCPS.text = String.format("%.2f", ClicksperSecond)
-
-                // Reset counters for the next second
-                clicksInCurrentSecond = 0
-                lastClickTime = currentTimeMillis
-            } else {
-                // Increment click count within the current second
-                clicksInCurrentSecond++
+            // Check if the click occurred within the minimum interval
+            if (elapsedTime < MIN_CLICK_INTERVAL) {
+                return 0f // Ignore the click, too soon after the last one
             }
+
+            Log.d("CPS Debug", "Elapsed Time: $elapsedTime ms")
+
+            // Calculate CPS based on total clicks and elapsed time
+            val cps = if (elapsedTime > 0) {
+                (TotalMissionClicks.toFloat() * 1000f / elapsedTime) / 1000f
+            } else {
+                0f
+            }
+
+            Log.d("CPS Debug", "CPS: $cps")
+
+            // Increment click count within the current second
+            clicksInCurrentSecond++
+
+            // Update last click time
+            lastClickTime = currentTimeMillis
+
+            // Limit CPS to two decimal points
+            return String.format("%.2f", cps).toFloat()
         }
+
+
+      /*  lvlCompleted.setOnClickListener{
+            Clicks = 0;
+            TotalMissionClicks = 0;
+            stopCountdownTimer()
+            DatabaseFunctions.levelCompleted(this,0,"0.0",0.0,0,0.0)
+            Log.i("info", "Current Mission: " + remainingTime.toDouble()+ " TotalMissionClicks: " + TotalMissionClicks + "Duration: " + remainingTime.toString())
+        }*/
 
         // LEVEL 0; 500 clicks (100/sub mission); Earth’s Great Dilemma
         btnLevel0Clicker.setOnClickListener(object : View.OnClickListener {
@@ -236,69 +277,86 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback {
                 Clicks +=5;
                 txtClicks.text = Clicks.toString();
 
+                // --SUB MISSION--
+                MissionReq = 100
+
                 //CLICKS PER SECOND
-                calculateCPS()
+                // Calculate CPS
+                val cps = calculateCPS()
+                txtCPS.text = String.format("%.2f", cps)
+
+                Log.i("CPS", cps.toString())
 
                 //LEVEL MISSION
                 TotalMissionClicks+=5
-                if (TotalMissionClicks == 500)
+                if (TotalMissionClicks >= 500)
                 {
-                    TotalMissionClicks == 0
-                    Clicks = 0;
-                    //next mission
-                    stopCountdownTimer() // Stop the countdown timer when the activity is destroyed
+                    DatabaseFunctions.levelCompleted(this@GameActivity,0,"0.0",0.0,0,remainingTime.toDouble())
 
+                    //next mission
+                    Log.i("info", "Remaining Time Before: " + remainingTime.toString())
+                    Log.i("info", "Time Remaining = " + remainingTime.toDouble().toString())
                     DatabaseFunctions.accessUserDocument(this@GameActivity) { userDocument ->
                         if (userDocument != null) {
-
+                            Log.i("info", "Mission Complete")
                             //Current level
                             val dbCurrentLevel: Long? = userDocument.currentLevel
                             val currentLevel: Int = dbCurrentLevel?.toInt() ?: 0
                             val currentMission = userDocument.currentMission ?: "0.0"
-                            var newCurMissionAfterLevel: String? =
-                                getNextCurrentMissionAfterLevel(currentMission)
-                            var newLevel: Int? =
-                                GameFunctions.getNextLevel(currentLevel)
+                            var newCurMissionAfterLevel: String? = getNextCurrentMissionAfterLevel(currentMission)
+                            var newLevel: Int? = GameFunctions.getNextLevel(currentLevel)
                             if (newCurMissionAfterLevel != null && newLevel != null) {
+                                Log.i("DatabaseFunctions", "Remaining Time Before: " + remainingTime.toString())
+                                Log.i("DatabaseFunctions", "Time Remaining = " + remainingTime.toDouble().toString())
                                 levelCompleted(
                                     this@GameActivity,
                                     newLevel.toLong(),
                                     newCurMissionAfterLevel,
                                     0.00,
                                     TotalMissionClicks.toLong(),
-                                    secondsRemaining.toDouble()
+                                    remainingTime.toDouble()
                                 )
                                 Toast.makeText(
                                     this@GameActivity,
                                     "Current Level: " + newLevel.toString() +
                                             "Current Mission: " + newCurMissionAfterLevel +
                                             "TotalMissionClicks: " + TotalMissionClicks +
-                                            "Duration: " + secondsRemaining.toString(),
+                                            "Duration: " + remainingTime.toString(),
                                             Toast.LENGTH_LONG).show();
+                            }}}
+
+
+                   stopCountdownTimer() // Stop the countdown timer when the a ctivity is destroyed
+                    TotalMissionClicks = 0;
+                    Clicks = 0;
+
+                    startCountdownTimer()
+                }
+
+                else if (Clicks % MissionReq == 0 && Clicks < 500 && Clicks != 0) {
+                    //Sub Mission = Complete
+                    DatabaseFunctions.accessUserDocument(this@GameActivity){ userDocument ->
+                        if (userDocument != null){
+                            val currentMission = userDocument.currentMission?: "0.0"
+                            var newCurMission: String? = GameFunctions.getNextCurrentMission(currentMission)
+                            if (newCurMission != null) {
+
+                                Log.i("info", "Current Mission: " + newCurMission + " TotalMissionClicks: " + TotalMissionClicks + "Duration: " + remainingTime.toString())
+                                subMissionCompleted(this@GameActivity, newCurMission, remainingTime.toDouble(), TotalMissionClicks.toLong())
+                                Toast.makeText(this@GameActivity, "Current Mission: " + newCurMission + " TotalMissionClicks: " + TotalMissionClicks + "Duration: " + remainingTime.toString(), Toast.LENGTH_SHORT).show();
                             }
                         }
                     }
                 }
-                if (TotalMissionClicks == 1) {
-                    startCountdownTimer()
-                }
-                // --SUB MISSION--
-                MissionReq = 100
 
-                //PerSubMission
-                if (Clicks % MissionReq == 0 && Clicks < 500) {
-                      //Sub Mission = Complete
-                      DatabaseFunctions.accessUserDocument(this@GameActivity){ userDocument ->
-                          if (userDocument != null){
-                              val currentMission = userDocument.currentMission?: "0.0"
-                              var newCurMission: String? = GameFunctions.getNextCurrentMission(currentMission)
-                              if (newCurMission != null) {
-                                  subMissionCompleted(this@GameActivity, newCurMission, secondsRemaining.toDouble(), TotalMissionClicks.toLong())
-                                  Toast.makeText(this@GameActivity, "Current Mission: " + newCurMission + " TotalMissionClicks: " + TotalMissionClicks, Toast.LENGTH_SHORT).show();
-                              }
-                      }
+                if (TotalMissionClicks >= 0) {
+                    if (buffer == 0) {
+                        startCountdownTimer()
+                        buffer++
                     }
+
                 }
+
             }
         })
 

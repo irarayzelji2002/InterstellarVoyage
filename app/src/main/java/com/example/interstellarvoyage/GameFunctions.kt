@@ -41,7 +41,7 @@ object GameFunctions {
         val parts = currentMission.split(".") //split string
         if (parts.size == 2) {
             val incrementedFirstPart = (parts[0].toInt() + 1).toString() //increment the first digit
-            return "${incrementedFirstPart}.0" //combine to string
+            return "${incrementedFirstPart}.1" //combine to string
         }
         return currentMission
     }
