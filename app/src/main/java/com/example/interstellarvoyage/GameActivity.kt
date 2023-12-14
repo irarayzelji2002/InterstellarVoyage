@@ -9,14 +9,12 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
-import android.graphics.drawable.AnimationDrawable
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.IBinder
 import android.util.Log
 import android.view.View
-import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import android.widget.Button
@@ -31,7 +29,7 @@ import com.example.interstellarvoyage.DatabaseFunctions.levelCompleted
 import com.example.interstellarvoyage.DatabaseFunctions.subMissionCompleted
 import com.example.interstellarvoyage.GameFunctions.getNextCurrentMissionAfterLevel
 
-class GameActivity : AppCompatActivity(), MusicPlayerCallback {
+class GameActivity : AppCompatActivity(), MusicPlayerCallback, GameOptionsActivity.OnDialogDismissedListener {
     private lateinit var musicPlayer: MusicPlayer
     private lateinit var popSound: MusicPlayer
     private var bound = false
@@ -269,6 +267,7 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback {
             dialogFragment.setCancelable(false)
             dialogFragment.setMusicPlayerCallback(this)
             dialogFragment.show(supportFragmentManager, "Logout Confirm Dialog")
+
         }
     }
 
@@ -300,6 +299,10 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback {
             bound = false
             serviceConnected = false
         }
+    }
+
+    override fun onDialogDismissed() {
+
     }
 
     // Start Timer

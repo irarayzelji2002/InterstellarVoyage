@@ -1,5 +1,6 @@
 package com.example.interstellarvoyage
 
+import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -16,10 +17,19 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.DialogFragment
 
 class GameOptionsActivity : DialogFragment() {
+    interface OnDialogDismissedListener {
+        fun onDialogDismissed()
+    }
+
     private var musicPlayerCallback: MusicPlayerCallback? = null
+    private var onDialogDismissedListener: OnDialogDismissedListener? = null
 
     fun setMusicPlayerCallback(callback: MusicPlayerCallback) {
         musicPlayerCallback = callback
+    }
+
+    fun setOnDialogDismissedListener(listener: OnDialogDismissedListener) {
+        onDialogDismissedListener = listener
     }
 
     override fun onCreateView(
@@ -83,6 +93,13 @@ class GameOptionsActivity : DialogFragment() {
         }
 
         return rootView
+    }
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val dialog = super.onCreateDialog(savedInstanceState)
+        dialog.setOnDismissListener {
+            onDialogDismissedListener?.onDialogDismissed()
+        }
+        return dialog
     }
 
     override fun getTheme(): Int {
