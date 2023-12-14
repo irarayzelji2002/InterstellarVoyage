@@ -1,6 +1,7 @@
 package com.example.interstellarvoyage
 
 import android.content.Context
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import com.google.firebase.firestore.FirebaseFirestore
@@ -29,6 +30,7 @@ object GameFunctions {
     }
 
     fun getNextMissionId(currentMission: String): String {
+        Log.d("Storyline Debug", "inside getNextMissionId")
         val parts = currentMission.split(".") //split string
         if (parts.size == 2) {
             val incrementedLastPart = (parts[1].toInt() + 1).toString() //increment the last digit
@@ -44,6 +46,8 @@ object GameFunctions {
     }
 
     fun getNextMissionIdStoryline(currentStoryline: String) : String {
+        Log.d("Storyline Debug", "inside getNextMissionIdStoryline")
+        Log.d("Storyline Debug", currentStoryline)
         val parts = currentStoryline.split(".") //split string
         if (parts.size == 3) {
             val incrementedLastPart = (parts[2].toInt() + 1).toString() //increment the last digit

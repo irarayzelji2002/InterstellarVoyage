@@ -104,7 +104,10 @@ class MissionsActivity : AppCompatActivity(), MusicPlayerCallback {
                 }
 
                 // Show sub mission name or locked
-                val currentMission: String = userMissions.currentMission?.toString() ?: ""
+                var currentMission: String = userMissions.currentMission?.toString() ?: ""
+                if(currentMission == "4.0" || currentMission == "4.1"){
+                    currentMission = "3.5"
+                }
                 val currentMissionData = GameData.missions.find { it.id == currentMission }
                 Log.d("Debug", "currentMission $currentMission")
                 Log.d("Debug", "currentMissionData $currentMissionData")

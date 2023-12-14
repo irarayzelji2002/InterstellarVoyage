@@ -81,7 +81,9 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback {
 
         val playIntent = Intent(this, MusicPlayer::class.java)
         playIntent.action = MusicPlayer.ACTION_PLAY_MUSIC
-        getBackgroundMusic(playIntent, false)
+
+        getBackgroundMusic(playIntent)
+
         popSound = MusicPlayer()
 
         // Click related
@@ -103,6 +105,7 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback {
         var storylineContainer : RelativeLayout = findViewById(R.id.storylineContainer) //hide if clicks not reached
         var txtStoryline : TextView = findViewById(R.id.txtStoryline)
         var btnStoryline : Button = findViewById(R.id.btnStoryline)
+        btnStoryline.isClickable = false
 
         // Clicks Number and Time Duration
         var txtClicks : TextView = findViewById(R.id.txtClicks)
@@ -130,12 +133,55 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback {
                 Log.d("FirestoreData", "Current Duration: ${userDocument.currentDuration}")
                 Log.d("FirestoreData", "Number of Clicks: ${userDocument.numberOfClicks}")
                 Log.d("FirestoreData", "Total Time Completed: ${userDocument.totalTimeCompleted}")
-                //displayStoryline(storylineContainer, txtStoryline, btnStoryline)
+                var btnClicker: LottieAnimationView = btnLevel0Clicker
+                DatabaseFunctions.accessUserDocument(this) { userDocument ->
+                    if(userDocument != null) {
+                        val dbCurrentLevel: Long? = userDocument.currentLevel
+                        val currentLevel: Int = dbCurrentLevel?.toInt() ?: 0
+                        if(currentLevel == 0) {
+                            btnClicker = btnLevel0Clicker
+                        } else if(currentLevel == 1) {
+                            btnClicker = btnLevel1Clicker
+                        } else if(currentLevel == 2) {
+                            btnClicker = btnLevel2Clicker
+                        } else if(currentLevel == 3) {
+                            btnClicker = btnLevel3Clicker
+                        } else if(currentLevel == 4) {
+                            btnClicker = btnLevel3Clicker
+                        }
+                    }
+                }
+                //displayStoryline(storylineContainer, txtStoryline, btnStoryline, btnClicker)
 
                 // Set clicks count
                 txtClicks.text = userDocument.numberOfClicks.toString()
 
-                // Start time
+                var isCountdownRunning = false
+                CountdownBG.addAnimatorListener(object : Animator.AnimatorListener {
+                    override fun onAnimationStart(animation: Animator) {
+                        isCountdownRunning = true
+                        btnLevel0Clicker.isClickable = !isCountdownRunning
+                        btnLevel1Clicker.isClickable = !isCountdownRunning
+                        btnLevel2Clicker.isClickable = !isCountdownRunning
+                        btnLevel3Clicker.isClickable = !isCountdownRunning
+                    }
+
+                    override fun onAnimationEnd(animation: Animator) {
+                        isCountdownRunning = false
+                        CountdownBG.visibility = View.GONE
+                        btnLevel0Clicker.isClickable = !isCountdownRunning
+                        btnLevel1Clicker.isClickable = !isCountdownRunning
+                        btnLevel2Clicker.isClickable = !isCountdownRunning
+                        btnLevel3Clicker.isClickable = !isCountdownRunning
+                    }
+
+                    override fun onAnimationCancel(animation: Animator) {
+                        isCountdownRunning = false
+                    }
+
+                    override fun onAnimationRepeat(animation: Animator) {}
+                })
+                CountdownBG.playAnimation()
             }
         }
 
@@ -180,12 +226,41 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback {
 
         btnStoryline.setOnClickListener {
             //Toast.makeText(this@GameActivity,"story button clicked", Toast.LENGTH_SHORT)
-            displayStoryline(storylineContainer, txtStoryline, btnStoryline)
-            if(btnStoryline.text.toString() == "START MISSION" || btnStoryline.text.toString() == "NEXT LEVEL" || btnStoryline.text.toString() == "CONTINUE") {
-                storylineContainer.visibility = View.GONE
-                btnStoryline.text = ""
-            } else {
-                storylineContainer.visibility = View.VISIBLE
+            var btnClicker: LottieAnimationView = btnLevel0Clicker
+            DatabaseFunctions.accessUserDocument(this) { userDocument ->
+                if(userDocument != null) {
+                    val dbCurrentLevel: Long? = userDocument.currentLevel
+                    val currentLevel: Int = dbCurrentLevel?.toInt() ?: 0
+                    Log.d("Storyline next", "currLvl: "+currentLevel.toString())
+                    if(currentLevel == 0) {
+                        btnClicker = btnLevel0Clicker
+                    } else if(currentLevel == 1) {
+                        btnClicker = btnLevel1Clicker
+                    } else if(currentLevel == 2) {
+                        btnClicker = btnLevel2Clicker
+                    } else if(currentLevel == 3) {
+                        btnClicker = btnLevel3Clicker
+                    } else if(currentLevel == 4) {
+                        btnClicker = btnLevel3Clicker
+                    }
+
+                    if(btnStoryline.text.toString() == "NEXT LEVEL" || btnStoryline.text.toString() == "CONTINUE") {
+                        showLevelGraphics(levelGraphicsList, CompletedLevelsBG)
+                        getBackgroundMusic(playIntent)
+                    }
+                    Log.d("Storyline next", btnStoryline.text.toString())
+                    Log.d("Storyline next", btnClicker.toString())
+                    if(btnStoryline.text.toString() == "START MISSION" || btnStoryline.text.toString() == "NEXT LEVEL" || btnStoryline.text.toString() == "CONTINUE") {
+                        storylineContainer.visibility = View.GONE
+                        btnClicker.isClickable = true
+                        btnStoryline.isClickable = false
+                        btnStoryline.text = ""
+                        currentStoryline = ""
+                    } else {
+                        displayStoryline(storylineContainer, txtStoryline, btnStoryline, btnClicker)
+                        storylineContainer.visibility = View.VISIBLE
+                    }
+                }
             }
         }
 
@@ -195,32 +270,6 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback {
             dialogFragment.setMusicPlayerCallback(this)
             dialogFragment.show(supportFragmentManager, "Logout Confirm Dialog")
         }
-
-        var isCountdownRunning = false
-        CountdownBG.addAnimatorListener(object : Animator.AnimatorListener {
-            override fun onAnimationStart(animation: Animator) {
-                isCountdownRunning = true
-                btnLevel0Clicker.isClickable = !isCountdownRunning
-                btnLevel1Clicker.isClickable = !isCountdownRunning
-                btnLevel2Clicker.isClickable = !isCountdownRunning
-                btnLevel3Clicker.isClickable = !isCountdownRunning
-            }
-
-            override fun onAnimationEnd(animation: Animator) {
-                isCountdownRunning = false
-                CountdownBG.visibility = View.GONE
-                btnLevel0Clicker.isClickable = !isCountdownRunning
-                btnLevel1Clicker.isClickable = !isCountdownRunning
-                btnLevel2Clicker.isClickable = !isCountdownRunning
-                btnLevel3Clicker.isClickable = !isCountdownRunning
-            }
-
-            override fun onAnimationCancel(animation: Animator) {
-                isCountdownRunning = false
-            }
-
-            override fun onAnimationRepeat(animation: Animator) {}
-        })
     }
 
     override fun onDestroy() {
@@ -365,17 +414,13 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback {
         }
     }
 
-    fun getBackgroundMusic(playIntent: Intent, fromNextLevel: Boolean) {
+    fun getBackgroundMusic(playIntent: Intent) {
         DatabaseFunctions.accessUserDocument(this) { userDocument ->
             if (userDocument != null) {
                 // Select music
                 Log.d("FirestoreData", "Current Level: ${userDocument.currentLevel}")
                 val dbCurrentLevel: Long? = userDocument.currentLevel
                 var currentLevel: Int = dbCurrentLevel?.toInt() ?: 0
-                if(fromNextLevel==true) {
-                    currentLevel++
-                }
-                // Change music to user's level
                 if (serviceConnected) {
                     changeLevelMusic(currentLevel)
                     if(currentLevel==0) {
@@ -404,7 +449,7 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback {
         }
     }
 
-    fun displayStoryline(storylineContainer: RelativeLayout, txtStoryline: TextView, btnStoryline: Button) {
+    fun displayStoryline(storylineContainer: RelativeLayout, txtStoryline: TextView, btnStoryline: Button, btnClicker: LottieAnimationView) {
         Log.d("Storyline Debug", "inside function")
         DatabaseFunctions.accessUserDocument(this@GameActivity) { userDocument ->
             if(userDocument != null) {
@@ -430,6 +475,8 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback {
                         btnStorylineText = "CONTINUE"
                     }
                     btnStoryline.setText(btnStorylineText)
+                    btnClicker.isClickable = false
+                    btnStoryline.isClickable = true
                     storylineContainer.visibility = View.VISIBLE
                 } else {
                     Log.d("Storyline", "No matching Line found for id: $currentMission")
@@ -444,7 +491,15 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback {
     fun btnClicker(btnClicker: LottieAnimationView, txtClicks: TextView, txtCPS:TextView, txtTime: TextView, levelGraphicsList: List<View>, CompletedLevelsBG:LottieAnimationView, MissionReg: Int, currentLevel: Int, playIntent:Intent, storylineContainer: RelativeLayout, txtStoryline: TextView, btnStoryline: Button) {
         popSound?.playPopSound(this@GameActivity)
         startBeatAnimation(btnClicker)
-        showLevelGraphics(levelGraphicsList, CompletedLevelsBG)
+        DatabaseFunctions.accessUserDocument(this@GameActivity) { userDocument ->
+            if (userDocument != null) {
+                val currentMission = userDocument.currentMission ?: "0.0"
+                val parts = currentMission.split(".") //split string
+                if (parts.size == 2 && parts[1].toInt() != 0) {
+                    //showLevelGraphics(levelGraphicsList, CompletedLevelsBG)
+                }
+            }
+        }
 
         Clicks +=5;
         txtClicks.text = Clicks.toString();
@@ -464,7 +519,7 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback {
         TotalMissionClicks+=5
         if (TotalMissionClicks >= maxClicksCount) {
             DatabaseFunctions.levelCompleted(this@GameActivity,currentLevel.toLong(),"0.0",0.0,0,remainingTime.toDouble())
-            displayStoryline(storylineContainer, txtStoryline, btnStoryline)
+            displayStoryline(storylineContainer, txtStoryline, btnStoryline, btnClicker)
             //next mission
             Log.i("info", "Remaining Time Before: " + remainingTime.toString())
             Log.i("info", "Time Remaining = " + remainingTime.toDouble().toString())
@@ -494,7 +549,6 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback {
                                 " Duration: " + remainingTime.toString(),
                             Toast.LENGTH_LONG).show();
                         Log.d("Current Level", currentLevel.toString())
-                        getBackgroundMusic(playIntent, true)
                         if(newLevel==4) {
                             DatabaseFunctions.calculateTotalTimeCompleted(this)
                         }
@@ -509,7 +563,7 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback {
             startCountdownTimer(txtTime)
         } else if (Clicks % MissionReq == 0 && Clicks < maxClicksCount && Clicks != 0) {
             //Sub Mission = Complete
-            displayStoryline(storylineContainer, txtStoryline, btnStoryline)
+            displayStoryline(storylineContainer, txtStoryline, btnStoryline, btnClicker)
             DatabaseFunctions.accessUserDocument(this@GameActivity){ userDocument ->
                 if (userDocument != null){
                     val currentMission = userDocument.currentMission?: "0.0"
