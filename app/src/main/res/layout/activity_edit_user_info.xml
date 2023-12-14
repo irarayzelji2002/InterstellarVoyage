@@ -263,6 +263,7 @@
                     android:fontFamily="@font/sharpsans_bold"
                     android:minHeight="70dp"
                     android:letterSpacing="0.05"
+                    android:lineHeight="30dp"
                     android:paddingHorizontal="35dp"
                     android:shadowColor="#80FFFFFF"
                     android:shadowDx="0.0"
@@ -271,6 +272,7 @@
                     android:text="Change Username"
                     android:textColor="@color/white"
                     android:textSize="16dp"
+                    android:paddingVertical="15dp"
                     app:backgroundTint="@null" />
 
                 <!--Email Address-->
@@ -398,6 +400,7 @@
                     android:fontFamily="@font/sharpsans_bold"
                     android:minHeight="70dp"
                     android:letterSpacing="0.05"
+                    android:lineHeight="30dp"
                     android:paddingHorizontal="35dp"
                     android:shadowColor="#80FFFFFF"
                     android:shadowDx="0.0"
@@ -406,6 +409,7 @@
                     android:text="Change Email Address"
                     android:textColor="@color/white"
                     android:textSize="16dp"
+                    android:paddingVertical="15dp"
                     app:backgroundTint="@null" />
 
                 <!--Password-->
@@ -566,6 +570,7 @@
                     android:fontFamily="@font/sharpsans_bold"
                     android:minHeight="70dp"
                     android:letterSpacing="0.05"
+                    android:lineHeight="30dp"
                     android:paddingHorizontal="35dp"
                     android:shadowColor="#80FFFFFF"
                     android:shadowDx="0.0"
@@ -574,8 +579,8 @@
                     android:text="Change Password"
                     android:textColor="@color/white"
                     android:textSize="16dp"
+                    android:paddingVertical="15dp"
                     app:backgroundTint="@null" />
-
             </LinearLayout>
         </ScrollView>
     </LinearLayout>

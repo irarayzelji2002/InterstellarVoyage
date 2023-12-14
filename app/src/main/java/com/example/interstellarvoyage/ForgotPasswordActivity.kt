@@ -9,6 +9,7 @@ import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -37,6 +38,8 @@ class ForgotPasswordActivity : DialogFragment() {
         var btnOK : Button = rootView.findViewById(R.id.btnOK)
         var txtEmail : TextView = rootView.findViewById(R.id.txtEmail)
 
+        var btnClose : ImageButton = rootView.findViewById(R.id.btnClose)
+
         btnSendEmail.setOnClickListener {
             var email = editTextEmailAddress.text.toString()
             val emailRegex = "^[A-Za-z](.*)([@]{1})(.{1,})(\\.)(.{1,})"
@@ -53,6 +56,11 @@ class ForgotPasswordActivity : DialogFragment() {
         }
 
         btnOK.setOnClickListener {
+            constraintLayoutShadow.setAnimation(fade_out)
+            dismiss()
+        }
+
+        btnClose.setOnClickListener {
             constraintLayoutShadow.setAnimation(fade_out)
             dismiss()
         }
