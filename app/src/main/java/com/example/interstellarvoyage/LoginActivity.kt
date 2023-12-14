@@ -28,6 +28,14 @@ class LoginActivity : AppCompatActivity(), MusicPlayerCallback  {
             musicPlayer = binder.getService()
             bound = true
             serviceConnected = true
+            musicPlayer.setVolume(0.1f,0.1f)
+
+            val userPref = getSharedPreferences("UserPrefs", AppCompatActivity.MODE_PRIVATE)
+            var isMusicEnabled = userPref.getBoolean("isMusicEnabled", true)
+            Log.d("isMusicEnabled", isMusicEnabled.toString())
+            if(!isMusicEnabled) {
+                pauseMusic()
+            }
             Log.i("Music", "Service Connected")
         }
 
@@ -97,7 +105,6 @@ class LoginActivity : AppCompatActivity(), MusicPlayerCallback  {
         }
 
         btnForgotPassword.setOnClickListener {
-            DatabaseFunctions.forgotPassword(this)
             var dialogFragment = ForgotPasswordActivity()
             dialogFragment.setCancelable(false)
             dialogFragment.show(supportFragmentManager, "Forgot Password Dialog")

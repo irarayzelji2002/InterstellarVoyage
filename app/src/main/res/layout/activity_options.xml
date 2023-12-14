@@ -268,7 +268,7 @@
             android:shadowDx="0.0"
             android:shadowDy="0.0"
             android:shadowRadius="10"
-            android:text="EDIT USER INFORMATION"
+            android:text="EDIT ACCOUNT"
             android:textColor="@color/white"
             android:textSize="16dp"
             app:backgroundTint="@null" />

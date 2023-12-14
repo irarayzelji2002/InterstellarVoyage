@@ -249,7 +249,8 @@
             android:text="X2 CLICKS"
             android:textAlignment="center"
             android:textSize="18dp"
-            android:textColor="#fff0cc"/>
+            android:textColor="#fff0cc"
+            android:visibility="gone"/>
     </LinearLayout>
 
     <!--CLICKS INFO-->

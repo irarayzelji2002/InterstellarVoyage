@@ -83,6 +83,7 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback, GameOptionsActivi
         getBackgroundMusic(playIntent)
 
         popSound = MusicPlayer()
+        popSound.setVolume(0.1f, 0.1f)
 
         // Click related
         // hide levelXGraphics if not in the level (e.g. level0Graphics.visibility = View.GONE/VISIBLE)
@@ -545,12 +546,12 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback, GameOptionsActivi
                             TotalMissionClicks.toLong(),
                             remainingTime.toDouble()
                         )
-                        Toast.makeText(this@GameActivity,
+                        /*Toast.makeText(this@GameActivity,
                                 "Current Level: " + newLevel.toString() +
                                 " Current Mission: " + newCurMissionAfterLevel +
                                 " TotalMissionClicks: " + TotalMissionClicks +
                                 " Duration: " + remainingTime.toString(),
-                            Toast.LENGTH_LONG).show();
+                            Toast.LENGTH_LONG).show();*/
                         Log.d("Current Level", currentLevel.toString())
                         if(newLevel==4) {
                             DatabaseFunctions.calculateTotalTimeCompleted(this)
@@ -574,7 +575,7 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback, GameOptionsActivi
                     if (newCurMission != null && newCurMission!="4.1") {
                         Log.i("info", "Current Mission: " + newCurMission + " TotalMissionClicks: " + TotalMissionClicks + "Duration: " + remainingTime.toString())
                         subMissionCompleted(this@GameActivity, newCurMission, remainingTime.toDouble(), TotalMissionClicks.toLong())
-                        Toast.makeText(this@GameActivity, "Current Mission: " + newCurMission + " TotalMissionClicks: " + TotalMissionClicks + "Duration: " + remainingTime.toString(), Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(this@GameActivity, "Current Mission: " + newCurMission + " TotalMissionClicks: " + TotalMissionClicks + "Duration: " + remainingTime.toString(), Toast.LENGTH_SHORT).show();
                     }
                 }
             }
@@ -638,7 +639,7 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback, GameOptionsActivi
         } else if(currentLevel==4) {
             changeMusic(R.raw.homepage_music)
         }
-        musicPlayer?.setVolume(1.0f, 1.0f)
+        musicPlayer?.setVolume(0.1f, 0.1f)
         val userPref = getSharedPreferences("UserPrefs", MODE_PRIVATE)
         val isMusicEnabled = userPref.getBoolean("isMusicEnabled", true)
         if(isMusicEnabled) {

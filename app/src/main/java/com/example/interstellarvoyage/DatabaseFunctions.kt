@@ -6,6 +6,9 @@ import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.Intent
 import android.util.Log
+import android.view.View
+import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.FragmentManager
 import com.google.firebase.FirebaseNetworkException
@@ -817,20 +820,34 @@ object DatabaseFunctions {
         }
     }
 
-    fun forgotPassword(context: Context){
-        val user = FirebaseAuth.getInstance().currentUser
-        if (user != null) {
-            FirebaseAuth.getInstance().sendPasswordResetEmail(user.email!!)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        Toast.makeText(context, "Email verification sent.", Toast.LENGTH_LONG).show()
-                    } else {
-                        Toast.makeText(context, "Failed to send verification email.", Toast.LENGTH_LONG).show()
+    fun forgotPassword(context: Context, email: String, emailSentContainer: LinearLayout, typeEmailContainer: LinearLayout, txtEmail: TextView, emailErr: TextView){
+        FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, "dummyPassword")
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    // Email is not in use, delete the dummy user
+                    val user = FirebaseAuth.getInstance().currentUser
+                    user?.delete()
+                    emailErr.text = "User with this email does not exist"
+                    emailErr.visibility = View.VISIBLE
+                } else {
+                    // Email is in use or there was an error
+                    val exception = task.exception
+                    if (exception is FirebaseAuthUserCollisionException) {
+                        // Email is in use
+                        FirebaseAuth.getInstance().sendPasswordResetEmail(email)
+                            .addOnCompleteListener { task ->
+                                if (task.isSuccessful) {
+                                    //Toast.makeText(context, "Email verification sent.", Toast.LENGTH_LONG).show()
+                                    txtEmail.text = email
+                                    typeEmailContainer.visibility = View.GONE
+                                    emailSentContainer.visibility = View.VISIBLE
+                                } else {
+                                    Toast.makeText(context, "Failed to send verification email.", Toast.LENGTH_LONG).show()
+                                }
+                            }
                     }
                 }
-        } else {
-            Toast.makeText(context, "User not found.", Toast.LENGTH_SHORT).show()
-        }
+            }
     }
 
     fun changeUsername(context: Context, newUsername: String, callback: (ChangeUsernameErr?) -> Unit) {
@@ -1443,18 +1460,6 @@ object DatabaseFunctions {
         } else {
             Toast.makeText(context, "User not found.", Toast.LENGTH_SHORT).show()
         }
-    }
-
-    fun changeEmailAdd(context: TestDatabaseActivity, email: String, password: String) {
-
-    }
-
-    fun changeUsername(context: TestDatabaseActivity, newUsername: String) {
-
-    }
-
-    fun changePassword(context: TestDatabaseActivity, oldpassword: String, newpassword: String, confirmnewpassword: String) {
-
     }
     // Don't delete below this
 }

@@ -27,6 +27,7 @@ class OptionsActivity : AppCompatActivity(), MusicPlayerCallback {
             musicPlayer = binder.getService()
             bound = true
             serviceConnected = true
+            musicPlayer.setVolume(0.1f,0.1f)
             Log.i("Music", "Service Connected")
         }
 

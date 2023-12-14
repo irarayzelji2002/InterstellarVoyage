@@ -77,19 +77,19 @@ class TestDatabaseActivity : AppCompatActivity() {
         }
 
         btnChangeEmailAdd.setOnClickListener {
-            DatabaseFunctions.changeEmailAdd(this, "irarayzelji@gmail.com", "irarayzelji")
+
         }
 
         btnChangePassword.setOnClickListener {
-            DatabaseFunctions.changePassword(this, "irarayzelji", "irarayzelji2002", "irarayzelji2002")
+
         }
 
         btnForgotPassword.setOnClickListener {
-            DatabaseFunctions.forgotPassword(this)
+
         }
 
         btnChangeUsername.setOnClickListener {
-            DatabaseFunctions.changeUsername(this, "myNewUsername")
+
         }
 
         btnLogout.setOnClickListener {

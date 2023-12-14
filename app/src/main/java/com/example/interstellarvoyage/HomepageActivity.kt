@@ -38,6 +38,7 @@ class HomepageActivity : AppCompatActivity(), MusicPlayerCallback {
                 musicPlayer.changeMusic(R.raw.homepage_music)
             }
             musicPlayer.setMusicEnabled(true)
+            musicPlayer.setVolume(0.1f, 0.1f)
 
             val userPref = getSharedPreferences("UserPrefs", AppCompatActivity.MODE_PRIVATE)
             var isMusicEnabled = userPref.getBoolean("isMusicEnabled", true)

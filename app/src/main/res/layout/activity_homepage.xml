@@ -73,7 +73,7 @@
         <Button
             android:id="@+id/btnMissions"
             android:layout_width="300dp"
-            android:layout_height="220px"
+            android:layout_height="wrap_content"
             android:minHeight="90dp"
             android:layout_gravity="center_horizontal|center"
             android:text="MISSIONS"
@@ -94,7 +94,7 @@
         <Button
             android:id="@+id/btnOptions"
             android:layout_width="300dp"
-            android:layout_height="220px"
+            android:layout_height="wrap_content"
             android:minHeight="90dp"
             android:layout_gravity="center_horizontal|center"
             android:text="OPTIONS"
@@ -115,7 +115,7 @@
         <Button
             android:id="@+id/btnLeaderboard"
             android:layout_width="300dp"
-            android:layout_height="220px"
+            android:layout_height="wrap_content"
             android:minHeight="90dp"
             android:layout_gravity="center_horizontal|center"
             android:text="LEADERBOARD"
