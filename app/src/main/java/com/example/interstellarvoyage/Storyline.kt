@@ -6,6 +6,7 @@ data class Line(val id: String, val btnText: Int, val line: String)
 object Storyline {
     val lines = listOf(
         // LEVEL 0
+        Line("0.0.1", 0, ""),
         Line("0.1.1", 0, "Today is December 14, 3055. The cities are overpopulated, with approximately 100,000 people per square kilometer. All countries worldwide lost control of regulating their population despite efforts to reduce it."),
         Line("0.1.2", 0, "In the previous decades, food technology has advanced so much, allowing people to extend their life expectancy significantly. Consequently, death rates have lowered a lot year by year, while birth rates are increasing."),
         Line("0.1.3", 1, "Research how the food in this generation increases life expectancy by reaching 100 clicks."),
@@ -27,6 +28,7 @@ object Storyline {
         Line("0.6.1", 2,  "After formulating plans and several backup plans, the team prepares for a long journey ahead. The team is now prepared for the long expedition ahead.  Congratulations! You have completed Level 0. Click “Next Level” to go to the next level."),
 
         // LEVEL 1
+        Line("1.0.1", 0, ""),
         Line("1.1.1", 0,  "The Gaia crew assembled on The Cosmic Gateway and planned for everything they would need for the long trip. It's April 22, 4010, the day of the warp drive going outside of the solar system."),
         Line("1.1.2", 1,  "Help the crew prepare for hibernation by reaching 200 clicks."),
 
@@ -47,6 +49,7 @@ object Storyline {
         Line("1.6.3", 2,  "Congratulations! You have completed Level 1. Click “Next Level” to go to the next level."),
 
         // LEVEL 2
+        Line("2.0.1", 0, ""),
         Line("2.1.1", 0,  "The team received a signal from a faraway galaxy that appeared to be some beacon because of deciphering some secrets. They tracked it through their technology, yet its location still can't be identified."),
         Line("2.1.2", 1,  "Try to help the team identify the source of the signal by reaching 300 clicks."),
 
@@ -63,6 +66,7 @@ object Storyline {
         Line("2.6.2", 2,  "Congratulations! You have completed Level 2. Click “Next Level” to go to the next level."),
 
         // LEVEL 3
+        Line("3.0.1", 0, ""),
         Line("3.1.1", 1,  "The team decided to follow The Cosmic Council's leader. The leader invites them to a grand assembly of various species across the universe. Discuss with the team about the invitation by reaching 400 clicks."),
 
         Line("3.2.1", 1,  "Shocked by how different everyone is, they can't believe their eyes. Everyone is distinct, unique, and different, yet all are unified. Explore the place by reaching 800 clicks."),
