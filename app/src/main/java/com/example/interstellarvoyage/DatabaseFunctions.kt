@@ -1212,12 +1212,13 @@ object DatabaseFunctions {
                                     val currentLevel = document.getLong("currentLevel") ?: 0L
                                     val timeCompleted = document.getDouble("timeCompletedForLevels.level$levelToQuery") ?: 0.0
                                     currentLevel > levelToQuery && timeCompleted > 0.0
-                                }.take(5)
+                                }
 
+                                val sortedUsers = filteredUsers.sortedBy { it.getDouble("timeCompletedForLevels.level$levelToQuery") }
                                 val leaderboardForCurrentLevel = mutableListOf<LeaderboardEntry>()
 
                                 var userRank = 1
-                                for (document in filteredUsers) {
+                                for (document in sortedUsers.take(5)) {
                                     Log.d("FirestoreData1", "User Lvl: ${document.getLong("currentLevel")}, UserId: ${document.id}")
                                     // Extract details from the document
                                     val userId = document.id
@@ -1259,6 +1260,7 @@ object DatabaseFunctions {
                                         val timeCompleted = document.getDouble("timeCompletedForLevels.level$levelToQuery") ?: 0.0
                                         // Store current user's rank
                                         currentUserRankCurrentLevel = LeaderboardEntry(userRank1, userId, username, timeCompleted)
+                                        break
                                     }
                                     // Increment the rank
                                     userRank1++

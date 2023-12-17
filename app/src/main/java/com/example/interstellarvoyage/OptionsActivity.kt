@@ -139,7 +139,9 @@ class OptionsActivity : AppCompatActivity(), MusicPlayerCallback {
         }
 
         btnLogout.setOnClickListener {
-            DatabaseFunctions.logout(this)
+            var dialogFragment = LogoutConfirmActivity()
+            dialogFragment.setCancelable(false)
+            dialogFragment.show(supportFragmentManager, "Logout Confirm Activity")
         }
 
         btnDeleteAccount.setOnClickListener {

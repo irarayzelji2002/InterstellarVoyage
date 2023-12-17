@@ -18,7 +18,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:lottie_autoPlay="true"
-        app:lottie_rawRes="@raw/four_login_reg_edit_delete_bg"
+        app:lottie_rawRes="@raw/three_missions_leaderboard_options_bg"
         app:lottie_loop="true"
         android:scaleType="centerCrop"
         tools:ignore="MissingConstraints" />
@@ -263,7 +263,7 @@
                     android:fontFamily="@font/sharpsans_bold"
                     android:minHeight="70dp"
                     android:letterSpacing="0.05"
-                    android:lineHeight="30dp"
+                    android:lineHeight="25dp"
                     android:paddingHorizontal="35dp"
                     android:shadowColor="#80FFFFFF"
                     android:shadowDx="0.0"
@@ -272,7 +272,7 @@
                     android:text="Change Username"
                     android:textColor="@color/white"
                     android:textSize="16dp"
-                    android:paddingVertical="15dp"
+                    android:paddingVertical="20dp"
                     app:backgroundTint="@null" />
 
                 <!--Email Address-->
@@ -400,7 +400,7 @@
                     android:fontFamily="@font/sharpsans_bold"
                     android:minHeight="70dp"
                     android:letterSpacing="0.05"
-                    android:lineHeight="30dp"
+                    android:lineHeight="25dp"
                     android:paddingHorizontal="35dp"
                     android:shadowColor="#80FFFFFF"
                     android:shadowDx="0.0"
@@ -409,7 +409,7 @@
                     android:text="Change Email Address"
                     android:textColor="@color/white"
                     android:textSize="16dp"
-                    android:paddingVertical="15dp"
+                    android:paddingVertical="20dp"
                     app:backgroundTint="@null" />
 
                 <!--Password-->
@@ -570,7 +570,7 @@
                     android:fontFamily="@font/sharpsans_bold"
                     android:minHeight="70dp"
                     android:letterSpacing="0.05"
-                    android:lineHeight="30dp"
+                    android:lineHeight="25dp"
                     android:paddingHorizontal="35dp"
                     android:shadowColor="#80FFFFFF"
                     android:shadowDx="0.0"
@@ -579,7 +579,7 @@
                     android:text="Change Password"
                     android:textColor="@color/white"
                     android:textSize="16dp"
-                    android:paddingVertical="15dp"
+                    android:paddingVertical="20dp"
                     app:backgroundTint="@null" />
             </LinearLayout>
         </ScrollView>
