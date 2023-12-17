@@ -1,32 +1,34 @@
 package com.example.interstellarvoyage
 
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.View
+import android.widget.RelativeLayout
+import android.widget.TextView
 import android.widget.Toast
 import com.google.firebase.firestore.FirebaseFirestore
 
-data class ChangeNalang(
-    val kahitano1: Long?,
-    val kahitano2: Double?,
-    val kahitano3: String?
-)
-
 object GameFunctions {
     val db = FirebaseFirestore.getInstance()
+    var handler: Handler? = null
+    var isTimerRunning = false
+    var elapsedTime = 0L
 
     fun findNextLine(context: Context, currentMission: String, currentStoryline: String): Line? {
-        var nextMissionId = ""
-        nextMissionId = getNextMissionId(currentMission)
-        if (currentStoryline != "") {
-            val parts = currentStoryline.split(".")
-            if (parts[2].toInt() >= 1) {
-                nextMissionId = getNextMissionIdStoryline(currentStoryline)
-            } else {
-                nextMissionId = getNextMissionId(currentMission)
+        Log.d("findNextLine", "currMission: ${currentMission}; currStoryline: ${currentStoryline}")
+            var nextMissionId = ""
+            nextMissionId = getNextMissionId(currentMission)
+            if (currentStoryline != "") {
+                val parts = currentStoryline.split(".")
+                if (parts[2].toInt() >= 1) {
+                    nextMissionId = getNextMissionIdStoryline(currentStoryline)
+                } else {
+                    nextMissionId = getNextMissionId(currentMission)
+                }
             }
-        }
-        return Storyline.lines.find { it.id == nextMissionId }
+            return Storyline.lines.find { it.id == nextMissionId }
     }
 
     fun getNextMissionId(currentMission: String): String {
@@ -65,59 +67,78 @@ object GameFunctions {
         return currentMission
     }
 
-    fun getNextCurrentMissionAfterLevel(currentMission: String): String? { //0.1 -> 0.2
-        val parts = currentMission.split(".") //split string
-        if (parts.size == 2) {
-            val incrementedFirstPart = (parts[0].toInt() + 1).toString() //increment the first digit
-            return "${incrementedFirstPart}.0" //combine to string
-        }
-        return currentMission
+    fun getNextCurrentMissionAfterLevel(currentLevel: String): String? { //0.1 -> 0.2
+        //val parts = currentMission.split(".") //split string
+        //if (parts.size == 2) {
+        //    val incrementedFirstPart = (parts[0].toInt() + 1).toString() //increment the first digit
+            return "${currentLevel}.0" //combine to string
+        //}
+        //return currentMission
     }
 
     fun getNextLevel(currentLevel: Int): Int? {
         return currentLevel + 1
     }
 
-    fun playMusic(context: Context) {
-
+    fun initializeTimer(context: Context, txtTime: TextView) {
+        DatabaseFunctions.accessUserDocument(context) { userDocument ->
+            if (userDocument != null) {
+                val dbCurrentDuration = userDocument.currentDuration
+                elapsedTime = dbCurrentDuration?.toLong() ?: 0 //seconds
+                elapsedTime *= 1000
+                val seconds = elapsedTime / 1000
+                val minutes = seconds / 60
+                val remainingSeconds = seconds % 60
+                txtTime.text = String.format("%02d:%02d", minutes, remainingSeconds)
+                Log.d("Timer", "Initialized elapsedTime: $elapsedTime")
+            }
+        }
     }
 
-    fun pauseMusic(context: Context) {
+    // Start Timer
+    fun startCountupTimer(txtTime: TextView) {
+        handler = Handler(Looper.getMainLooper())
+        isTimerRunning = true
+        Log.d("Timer", "elapsedTime: $elapsedTime")
 
+        handler?.post(object : Runnable {
+            override fun run() {
+                if (isTimerRunning) {
+                    elapsedTime += 1000L
+                    Log.d("Timer", "elapsedTime inside: $elapsedTime")
+                    val seconds = elapsedTime / 1000
+                    val minutes = seconds / 60
+                    val remainingSeconds = seconds % 60
+                    txtTime.text = String.format("%02d:%02d", minutes, remainingSeconds)
+                    var timeShown = String.format("%02d:%02d", minutes, remainingSeconds)
+                    Log.d("Timer", timeShown)
+
+                    // Post delayed with 1000ms (1 second) interval
+                    handler?.postDelayed(this, 1000)
+                }
+            }
+        })
     }
 
-    fun buttonClickSound(context: Context, view: View) {
-        /*lateinit var lottiePerson: LottieAnimationView
-        lateinit var mediaPlayer: MediaPlayer
-
-        override fun onCreate(savedInstanceState: Bundle?) {
-            super.onCreate(savedInstanceState)
-            setContentView(R.layout.activity_main)
-
-            lottiePerson = findViewById(R.id.lottiePerson)
-            mediaPlayer = MediaPlayer.create(this, R.raw.bubble_sound)
-        }*/
-
-        /*// Play the click sound
-        mediaPlayer.start()
-
-        // Add your click effect animations
-        val scaleUp = ScaleAnimation(1f, 1.2f, 1f, 1.2f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f)
-        scaleUp.duration = 300
-        scaleUp.fillAfter = true
-
-        val scaleDown = ScaleAnimation(1.2f, 1f, 1.2f, 1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f)
-        scaleDown.duration = 300
-        scaleDown.fillAfter = true
-
-        val animationSet = AnimationSet(true)
-        animationSet.addAnimation(scaleUp)
-        animationSet.addAnimation(scaleDown)
-
-        lottiePerson.startAnimation(animationSet)*/
+    // Pause Timer
+    fun pauseCountupTimer() {
+        isTimerRunning = false
     }
 
-    fun scaleAnimation(context: Context) {
+    // Resume Timer
+    fun resumeCountupTimer(txtTime: TextView, storylineContainer: RelativeLayout, isCountdownRunning: Boolean) {
+        Log.d("Timer", "isTimerRunning: "+isTimerRunning.toString())
+        if (!isTimerRunning && storylineContainer.visibility == View.GONE && !isCountdownRunning) {
+            isTimerRunning = true
+            startCountupTimer(txtTime)
+        }
+    }
 
+    // Stop Timer
+    fun stopCountupTimer() {
+        isTimerRunning = false
+        elapsedTime = 0
+        handler?.removeCallbacksAndMessages(null)
+        handler = null
     }
 }

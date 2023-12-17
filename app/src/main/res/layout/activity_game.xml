@@ -246,7 +246,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/sharpsans_extrabold"
             android:letterSpacing="0.075"
-            android:text="X2 CLICKS"
+            android:text="1ST BOOST"
             android:textAlignment="center"
             android:textSize="18dp"
             android:textColor="#fff0cc"
@@ -285,7 +285,7 @@
                 android:layout_height="match_parent"
                 android:fontFamily="@font/sharpsans_extrabold"
                 android:textSize="18sp"
-                android:text="2000"
+                android:text="0"
                 android:layout_marginLeft="-57dp"
                 android:gravity="center"/>
         </LinearLayout>

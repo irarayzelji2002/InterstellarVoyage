@@ -309,7 +309,7 @@ object DatabaseFunctions {
                                                 val userData = hashMapOf(
                                                     "currentLevel" to 0,
                                                     "currentMission" to "0.0",
-                                                    "currentDuration" to 0.0,
+                                                    "currentDuration" to 0L,
                                                     "numberOfClicks" to 0L,
                                                     "totalTimeCompleted" to 0.0,
                                                     "userDetails" to hashMapOf(
@@ -1051,9 +1051,10 @@ object DatabaseFunctions {
         }
     }
 
-    fun levelCompleted (context: Context, currentLevel: Long, currentMission: String, currentDuration: Double, numberOfClicks: Long, timeCompletedForLevel: Double) {
+    fun levelCompleted (context: Context, currentLevel: Long, currentMission: String, currentDuration: Long, numberOfClicks: Long, timeCompletedForLevel: Long) {
         val user = FirebaseAuth.getInstance().currentUser
-
+        Log.d("lvlCompleted1", "curreLvl: "+currentLevel.toString()+"; currMiss: "+currentMission+"; currDur: "+currentDuration+"; numOfClicks: "+numberOfClicks+"; timeCompleted: "+timeCompletedForLevel)
+        var oldLevel: Int = currentLevel.toInt() - 1
         if (user != null) {
             val userDocumentRef = db.collection("users").document(user.uid)
             userDocumentRef.get()
@@ -1065,10 +1066,11 @@ object DatabaseFunctions {
                             "currentMission" to currentMission,
                             "currentDuration" to currentDuration,
                             "numberOfClicks" to numberOfClicks,
-                            "timeCompletedForLevels.level$currentLevel" to timeCompletedForLevel
+                            "timeCompletedForLevels.level$oldLevel" to timeCompletedForLevel
                         )
 
                         val updatedDataMap: Map<String, Any> = updatedData
+                        Log.d("lvlCompleted1", updatedData.toString())
 
                         //update in database
                         userDocumentRef.update(updatedDataMap)
@@ -1091,7 +1093,7 @@ object DatabaseFunctions {
         }
     }
 
-    fun subMissionCompleted(context: Context, currentMission: String, currentDuration: Double, numberOfClicks: Long) {
+    fun subMissionCompleted(context: Context, currentMission: String, currentDuration: Long, numberOfClicks: Long) {
         val user = FirebaseAuth.getInstance().currentUser
 
         if (user != null) {
@@ -1248,10 +1250,11 @@ object DatabaseFunctions {
                                     currentLevel > levelToQuery && timeCompleted > 0.0
                                 }
 
+                                val sortedUsers2 = filteredUsers.sortedBy { it.getDouble("timeCompletedForLevels.level$levelToQuery") }
                                 var currentUserRankCurrentLevel: LeaderboardEntry? = null
 
                                 var userRank1 = 1
-                                for (document in filteredUsers) {
+                                for (document in sortedUsers2) {
                                     Log.d("FirestoreData2", "User Lvl: ${document.getLong("currentLevel")}, UserId: ${document.id}")
                                     if(document.id == user.uid) {
                                         // Extract details from the document

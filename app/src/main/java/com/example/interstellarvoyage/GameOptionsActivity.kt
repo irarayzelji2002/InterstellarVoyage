@@ -17,19 +17,21 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.DialogFragment
 
 class GameOptionsActivity : DialogFragment() {
-    interface OnDialogDismissedListener {
-        fun onDialogDismissed()
-    }
-
     private var musicPlayerCallback: MusicPlayerCallback? = null
-    private var onDialogDismissedListener: OnDialogDismissedListener? = null
 
     fun setMusicPlayerCallback(callback: MusicPlayerCallback) {
         musicPlayerCallback = callback
     }
 
-    fun setOnDialogDismissedListener(listener: OnDialogDismissedListener) {
-        onDialogDismissedListener = listener
+    interface GameOptionsListener {
+        fun onContinueToGameClicked()
+        fun onBackToHomeClicked()
+    }
+
+    private var gameOptionsListener: GameOptionsListener? = null
+
+    fun setGameOptionsListener(listener: GameOptionsListener) {
+        gameOptionsListener = listener
     }
 
     override fun onCreateView(
@@ -64,11 +66,13 @@ class GameOptionsActivity : DialogFragment() {
         btnBackToHome.setOnClickListener {
             constraintLayoutShadow.setAnimation(fade_out)
             dismiss()
+            gameOptionsListener?.onBackToHomeClicked()
             startActivity(Intent(rootView.getContext(), HomepageActivity::class.java))
         }
         btnContinueToGame.setOnClickListener {
             constraintLayoutShadow.setAnimation(fade_out)
             dismiss()
+            gameOptionsListener?.onContinueToGameClicked()
         }
 
         btnMusic.setOnClickListener {
@@ -93,13 +97,6 @@ class GameOptionsActivity : DialogFragment() {
         }
 
         return rootView
-    }
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val dialog = super.onCreateDialog(savedInstanceState)
-        dialog.setOnDismissListener {
-            onDialogDismissedListener?.onDialogDismissed()
-        }
-        return dialog
     }
 
     override fun getTheme(): Int {

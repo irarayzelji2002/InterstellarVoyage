@@ -12,49 +12,48 @@ import android.content.ServiceConnection
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
-import android.view.animation.DecelerateInterpolator
 import android.widget.Button
-import android.widget.FrameLayout
 import android.widget.ImageButton
-import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
-import android.widget.Toast
 import com.airbnb.lottie.LottieAnimationView
 import com.example.interstellarvoyage.DatabaseFunctions.levelCompleted
 import com.example.interstellarvoyage.DatabaseFunctions.subMissionCompleted
+import com.example.interstellarvoyage.GameFunctions.elapsedTime
 import com.example.interstellarvoyage.GameFunctions.getNextCurrentMissionAfterLevel
 
-class GameActivity : AppCompatActivity(), MusicPlayerCallback, GameOptionsActivity.OnDialogDismissedListener {
+class GameActivity : AppCompatActivity(), MusicPlayerCallback, GameOptionsActivity.GameOptionsListener {
     private lateinit var musicPlayer: MusicPlayer
     private lateinit var popSound: MusicPlayer
     private var bound = false
     private var serviceConnected = false
     var isBeatAnimationRunning = false
 
-    var Clicks: Int = 0
-    var ClicksperSecond: Float = 0.0F
-
     var MissionReq: Int = 0
     var TotalMissionClicks: Int = 0;
-    var startTime = 0.0f
 
     var buffer: Int = 0
 
     var lastClickTime: Long = 0
     var clicksInCurrentSecond: Int = 0
 
-    var remainingSeconds: Long = 0
-    var remainingTime: Long = remainingSeconds.toLong()
-
-    var countdownTimer: CountDownTimer? = null
-    val countdownDuration = 500 // Change this to the desired number of clicks
-
     var currentStoryline = ""
+    var disableStoryline = false
+    var toChangeMusic = false
+    var isCountdownRunning = false
+    var currentDuration = 0L
+    var boost = 0
+
+    private lateinit var txtTime: TextView
+    private lateinit var txtBoost: TextView
+    private lateinit var storylineContainer: RelativeLayout
+    private lateinit var CountdownBG: LottieAnimationView
 
     private val connection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -96,20 +95,21 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback, GameOptionsActivi
         var level2Graphics : RelativeLayout = findViewById(R.id.level2Graphics)
         var btnLevel3Clicker : LottieAnimationView = findViewById(R.id.btnLevel3Clicker) //person with hands up
         var level3Graphics : RelativeLayout = findViewById(R.id.level3Graphics)
-        var CountdownBG : LottieAnimationView = findViewById(R.id.CountdownBG)
+        CountdownBG = findViewById(R.id.CountdownBG)
         var CompletedLevelsBG : LottieAnimationView = findViewById(R.id.CompletedLevelsBG)
         var levelGraphicsList = listOf(level0Graphics, level1Graphics, level2Graphics, level3Graphics)
 
         // Story related
-        var storylineContainer : RelativeLayout = findViewById(R.id.storylineContainer) //hide if clicks not reached
+        storylineContainer = findViewById(R.id.storylineContainer) //hide if clicks not reached
         var txtStoryline : TextView = findViewById(R.id.txtStoryline)
         var btnStoryline : Button = findViewById(R.id.btnStoryline)
         btnStoryline.isClickable = false
 
         // Clicks Number and Time Duration
         var txtClicks : TextView = findViewById(R.id.txtClicks)
-        var txtTime : TextView = findViewById(R.id.txtTime)
+        txtTime = findViewById(R.id.txtTime)
         var txtCPS : TextView = findViewById(R.id.txtCPS)
+        txtBoost = findViewById(R.id.txtBoost)
 
         // Options Button
         var btnOptions : ImageButton = findViewById(R.id.btnOptions)
@@ -118,10 +118,9 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback, GameOptionsActivi
         DatabaseFunctions.accessUserDocument(this) { userDocument ->
             if (userDocument != null) {
                 // Store Click & Duration to local variable
-                val dBsecondsRemaining  = userDocument.currentDuration
-                remainingTime = dBsecondsRemaining?.toLong()?: 0
+                GameFunctions.initializeTimer(this, txtTime)
                 val dbNumofClicks = userDocument.numberOfClicks
-                Clicks = dbNumofClicks?.toInt()?: 0
+                TotalMissionClicks = dbNumofClicks?.toInt()?: 0
 
                 // show level graphics
                 showLevelGraphics(levelGraphicsList, CompletedLevelsBG)
@@ -155,7 +154,6 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback, GameOptionsActivi
                 // Set clicks count
                 txtClicks.text = userDocument.numberOfClicks.toString()
 
-                var isCountdownRunning = false
                 CountdownBG.addAnimatorListener(object : Animator.AnimatorListener {
                     override fun onAnimationStart(animation: Animator) {
                         isCountdownRunning = true
@@ -172,6 +170,7 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback, GameOptionsActivi
                         btnLevel1Clicker.isClickable = !isCountdownRunning
                         btnLevel2Clicker.isClickable = !isCountdownRunning
                         btnLevel3Clicker.isClickable = !isCountdownRunning
+                        GameFunctions.startCountupTimer(txtTime)
                     }
 
                     override fun onAnimationCancel(animation: Animator) {
@@ -183,14 +182,6 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback, GameOptionsActivi
                 CountdownBG.playAnimation()
             }
         }
-
-        /*  lvlCompleted.setOnClickListener{
-            Clicks = 0;
-            TotalMissionClicks = 0;
-            stopCountdownTimer()
-            DatabaseFunctions.levelCompleted(this,0,"0.0",0.0,0,0.0)
-            Log.i("info", "Current Mission: " + remainingTime.toDouble()+ " TotalMissionClicks: " + TotalMissionClicks + "Duration: " + remainingTime.toString())
-        }*/
 
         // LEVEL 0; 500 clicks (100/sub mission); Earth’s Great Dilemma
         btnLevel0Clicker.setOnClickListener(object : View.OnClickListener {
@@ -243,21 +234,42 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback, GameOptionsActivi
                         btnClicker = btnLevel3Clicker
                     }
 
-                    if(btnStoryline.text.toString() == "NEXT LEVEL" || btnStoryline.text.toString() == "CONTINUE") {
-                        showLevelGraphics(levelGraphicsList, CompletedLevelsBG)
-                        getBackgroundMusic(playIntent)
-                    }
                     Log.d("Storyline next", btnStoryline.text.toString())
-                    Log.d("Storyline next", btnClicker.toString())
-                    if(btnStoryline.text.toString() == "START MISSION" || btnStoryline.text.toString() == "NEXT LEVEL" || btnStoryline.text.toString() == "CONTINUE") {
+                    Log.d("Storyline next", disableStoryline.toString())
+                    if (disableStoryline == true || currentStoryline == "" || btnStoryline.text == "") {
                         storylineContainer.visibility = View.GONE
                         btnClicker.isClickable = true
                         btnStoryline.isClickable = false
                         btnStoryline.text = ""
                         currentStoryline = ""
-                    } else {
+                        disableStoryline = false
+                        GameFunctions.resumeCountupTimer(txtTime, storylineContainer, isCountdownRunning)
+                        Log.d("Storyline next", "inside start mission/next level/continue")
+                    } else if (disableStoryline == false && toChangeMusic == false && btnStoryline.text == "NEXT" && currentStoryline != "") {
+                        btnStoryline.isClickable = true
                         displayStoryline(storylineContainer, txtStoryline, btnStoryline, btnClicker)
                         storylineContainer.visibility = View.VISIBLE
+                        Log.d("Storyline next", "inside next")
+                    } else {
+                        storylineContainer.visibility = View.GONE
+                        btnClicker.isClickable = true
+                        btnStoryline.isClickable = false
+                        btnStoryline.text = ""
+                        currentStoryline = ""
+                        disableStoryline = false
+                        GameFunctions.resumeCountupTimer(txtTime, storylineContainer, isCountdownRunning)
+                    }
+                    
+                    Log.d("Storyline next", toChangeMusic.toString())
+                    if(toChangeMusic == true) {
+                        GameFunctions.stopCountupTimer()
+                        GameFunctions.startCountupTimer(txtTime)
+                        TotalMissionClicks = 0
+                        txtClicks.text = TotalMissionClicks.toString()
+                        showLevelGraphics(levelGraphicsList, CompletedLevelsBG)
+                        getBackgroundMusic(playIntent)
+                        Log.d("Storyline next", "inside next level/continue")
+                        toChangeMusic = false
                     }
                 }
             }
@@ -266,9 +278,13 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback, GameOptionsActivi
         btnOptions.setOnClickListener {
             var dialogFragment = GameOptionsActivity()
             dialogFragment.setCancelable(false)
+            dialogFragment.setGameOptionsListener(this)
             dialogFragment.setMusicPlayerCallback(this)
-            dialogFragment.show(supportFragmentManager, "Logout Confirm Dialog")
-
+            dialogFragment.show(supportFragmentManager, "Options Dialog")
+            GameFunctions.pauseCountupTimer()
+            if (isCountdownRunning) {
+                CountdownBG.pauseAnimation()
+            }
         }
     }
 
@@ -278,6 +294,12 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback, GameOptionsActivi
             unbindService(connection)
             bound = false
         }
+        DatabaseFunctions.accessUserDocument(this) { userDocument ->
+            if (userDocument != null) {
+                val dbCurrentMission = userDocument.currentMission.toString()
+                subMissionCompleted(this@GameActivity, dbCurrentMission, currentDuration, TotalMissionClicks.toLong())
+            }
+        }
     }
 
     override fun onStop() {
@@ -285,6 +307,12 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback, GameOptionsActivi
         if (bound) {
             unbindService(connection)
             bound = false
+        }
+        DatabaseFunctions.accessUserDocument(this) { userDocument ->
+            if (userDocument != null) {
+                val dbCurrentMission = userDocument.currentMission.toString()
+                subMissionCompleted(this@GameActivity, dbCurrentMission, currentDuration, TotalMissionClicks.toLong())
+            }
         }
     }
 
@@ -300,35 +328,12 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback, GameOptionsActivi
             bound = false
             serviceConnected = false
         }
-    }
-
-    override fun onDialogDismissed() {
-
-    }
-
-    // Start Timer
-    fun startCountdownTimer(txtTime: TextView) {
-        countdownTimer = object : CountDownTimer(600000L, 1000L) {
-            override fun onTick(millisUntilFinished: Long) {
-                // Update the timer display on each tick
-                val secondsRemaining = (600000 - millisUntilFinished) / 1000
-                val minutes = secondsRemaining / 60
-                val seconds = secondsRemaining % 60
-                txtTime.text = String.format("%02d:%02d", minutes, seconds)
-                remainingTime= (600000 - millisUntilFinished)/1000
-            }
-
-            override fun onFinish() {
-                // Countdown is complete, update UI accordingly
-                txtTime.text = "Countdown Complete"
+        DatabaseFunctions.accessUserDocument(this) { userDocument ->
+            if (userDocument != null) {
+                val dbCurrentMission = userDocument.currentMission.toString()
+                subMissionCompleted(this@GameActivity, dbCurrentMission, currentDuration, TotalMissionClicks.toLong())
             }
         }
-        countdownTimer?.start()
-    }
-
-    // Stop Timer
-    fun stopCountdownTimer() {
-        countdownTimer?.cancel()
     }
 
     //Clicks Per Seconds
@@ -341,7 +346,6 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback, GameOptionsActivi
         if (elapsedTime < MIN_CLICK_INTERVAL) {
             return 0f // Ignore the click, too soon after the last one
         }
-
         Log.d("CPS Debug", "Elapsed Time: $elapsedTime ms")
 
         // Calculate CPS based on total clicks and elapsed time
@@ -350,16 +354,11 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback, GameOptionsActivi
         } else {
             0f
         }
-
         Log.d("CPS Debug", "CPS: $cps")
 
-        // Increment click count within the current second
-        clicksInCurrentSecond++
+        clicksInCurrentSecond++ // increment click count within the current second
+        lastClickTime = currentTimeMillis  // Update last click time
 
-        // Update last click time
-        lastClickTime = currentTimeMillis
-
-        // Limit CPS to two decimal points
         return String.format("%.2f", cps).toFloat()
     }
 
@@ -459,9 +458,16 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback, GameOptionsActivi
             if(userDocument != null) {
                 Log.d("Storyline Debug", "Doc not null")
                 val currentMission = userDocument.currentMission ?: "0.0"
-                val nextLine = GameFunctions.findNextLine(this, currentMission, currentStoryline)
+                val currentLevel = userDocument.currentLevel ?: 0
+                var nextLine = GameFunctions.findNextLine(this, currentMission, currentStoryline)
+                if(currentLevel.toInt() == 4) {
+                    nextLine = GameFunctions.findNextLine(this, "3.4", currentStoryline)
+                } else if (currentLevel.toInt() == 3 && currentMission == "0.0") {
+                    nextLine = GameFunctions.findNextLine(this, "3.4", currentStoryline)
+                }
                 if (nextLine != null) {
                     Log.d("Storyline Debug", "found next line: ${nextLine.id}")
+                    Log.d("Storyline Debug", "found next line: ${nextLine.line}")
                     val id = nextLine.id
                     currentStoryline = nextLine.id
                     val btnText = nextLine.btnText
@@ -473,19 +479,33 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback, GameOptionsActivi
                         btnStorylineText = "NEXT"
                     } else if (btnText == 1) {
                         btnStorylineText = "START MISSION"
+                        disableStoryline = true
+                        currentStoryline = ""
                     } else if (btnText == 2) {
                         btnStorylineText = "NEXT LEVEL"
+                        disableStoryline = true
+                        toChangeMusic = true
+                        currentStoryline = ""
                     } else if (btnText == 3) {
                         btnStorylineText = "CONTINUE"
+                        disableStoryline = true
+                        toChangeMusic = true
+                        currentStoryline = ""
                     }
                     btnStoryline.setText(btnStorylineText)
                     btnClicker.isClickable = false
-                    btnStoryline.isClickable = true
+                    disableStoryline = false
+                    //btnStoryline.isClickable = true
+                    val handler = Handler(Looper.getMainLooper())
+                    handler.postDelayed({ btnStoryline.isClickable = true }, 1000)
+                    GameFunctions.pauseCountupTimer()
                     storylineContainer.visibility = View.VISIBLE
                 } else {
+                    disableStoryline = false
+                    btnStoryline.isClickable = false
+                    btnClicker.isClickable = true
                     Log.d("Storyline", "No matching Line found for id: $currentMission")
-                    txtStoryline.text = Storyline.lines.find { it.id == "0.1.1" }?.line //first storyline
-                    btnStoryline.setText("NEXT")
+                    storylineContainer.visibility = View.GONE
                 }
             }
         }
@@ -495,96 +515,168 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback, GameOptionsActivi
     fun btnClicker(btnClicker: LottieAnimationView, txtClicks: TextView, txtCPS:TextView, txtTime: TextView, levelGraphicsList: List<View>, CompletedLevelsBG:LottieAnimationView, MissionReg: Int, currentLevel: Int, playIntent:Intent, storylineContainer: RelativeLayout, txtStoryline: TextView, btnStoryline: Button) {
         popSound?.playPopSound(this@GameActivity)
         startBeatAnimation(btnClicker)
-        DatabaseFunctions.accessUserDocument(this@GameActivity) { userDocument ->
-            if (userDocument != null) {
-                val currentMission = userDocument.currentMission ?: "0.0"
-                val parts = currentMission.split(".") //split string
-                if (parts.size == 2 && parts[1].toInt() != 0) {
-                    //showLevelGraphics(levelGraphicsList, CompletedLevelsBG)
-                }
+
+        currentDuration = elapsedTime / 1000
+
+        var isSubMissionComplete = false
+        if (MissionReq != 0) {
+            /*if ((TotalMissionClicks % MissionReq == 0 || TotalMissionClicks % MissionReq == 5 || TotalMissionClicks % MissionReq == 10 || TotalMissionClicks % MissionReq == 15 || TotalMissionClicks % MissionReq == 20) && boost !=0) {
+                isSubMissionComplete = true
+                boost = 0
+            } else*/ if (TotalMissionClicks % MissionReq == 0) {
+                isSubMissionComplete = true
             }
         }
 
-        Clicks +=5;
-        txtClicks.text = Clicks.toString();
-
-        //SUB MISSION
-        MissionReq = MissionReg
-
         //CLICKS PER SECOND
-        //Calculate CPS
-        val cps = calculateCPS()
-        txtCPS.text = String.format("%.2f", cps)
+        val cpsFloat = calculateCPS()
+        txtCPS.text = cpsFloat.toString()
+        Log.i("CPS", cpsFloat.toString())
 
-        Log.i("CPS", cps.toString())
+        boost = 5
+        val cps = String.format("%.2f", cpsFloat).toFloat().toInt()
+        if(cps <= 1) {
+            txtBoost.text = ""
+            txtBoost.visibility = View.GONE
+        } else if(cps <= 5) {
+            txtBoost.text = "1ST BOOST"
+            boost += (5 * 2)
+            txtBoost.visibility = View.VISIBLE
+        } else if (cps <= 10) {
+            txtBoost.text = "2ND BOOST"
+            boost += (5 * 3)
+            txtBoost.visibility = View.VISIBLE
+        } else if (cps <= 15) {
+            txtBoost.text = "3RD BOOST"
+            boost += (5 * 3)
+            txtBoost.visibility = View.VISIBLE
+        } else if (cps <= 20) {
+            txtBoost.text = "MAX BOOST"
+            boost += (5 * 4)
+            txtBoost.visibility = View.VISIBLE
+        } else {
+            txtBoost.text = "MAX BOOST"
+            boost += (5 * 4)
+            txtBoost.visibility = View.VISIBLE
+        }
 
+        txtClicks.text = TotalMissionClicks.toString();
+        MissionReq = MissionReg
+        var maxClicksCount = MissionReg * 5 // no. of sub missions
+        var toIncrement = false
+        TotalMissionClicks += 5
+
+        Log.d("Game Debug", TotalMissionClicks.toString() +" % "+MissionReg.toString()+" before boost: "+boost.toString())
+        Log.d("Game Debug", TotalMissionClicks.toString() +" == "+maxClicksCount.toString()+" before boost: "+boost.toString())
+
+        // Remove if no cps
+        /*if (((TotalMissionClicks + boost) % MissionReg == 5 ||
+            (TotalMissionClicks + boost) % MissionReg == 10 ||
+            (TotalMissionClicks + boost) % MissionReg == 15 ||
+            (TotalMissionClicks + boost) % MissionReg == 20 ||
+            (TotalMissionClicks + boost) % MissionReg == 25) &&
+            TotalMissionClicks != 0)
+        {
+            TotalMissionClicks = MissionReg
+            toIncrement = true
+        } else if((TotalMissionClicks + boost) > maxClicksCount) {
+            TotalMissionClicks = maxClicksCount
+            toIncrement = true
+        } else  {
+            TotalMissionClicks += boost
+        }*/
+
+        Log.d("Game Debug", TotalMissionClicks.toString() +" % "+MissionReg.toString()+" after boost: "+boost.toString())
+        Log.d("Game Debug", (TotalMissionClicks % MissionReq).toString())
+        Log.d("Game Debug", (TotalMissionClicks % MissionReq == 0).toString())
+        Log.d("Game Debug", TotalMissionClicks.toString() +" == "+maxClicksCount.toString()+" after boost: "+boost.toString())
+        Log.d("Game Debug", (TotalMissionClicks == maxClicksCount).toString())
         //LEVEL MISSION
-        var maxClicksCount = MissionReg * 5
-        TotalMissionClicks+=5
-        if (TotalMissionClicks >= maxClicksCount) {
-            DatabaseFunctions.levelCompleted(this@GameActivity,currentLevel.toLong(),"0.0",0.0,0,remainingTime.toDouble())
-            displayStoryline(storylineContainer, txtStoryline, btnStoryline, btnClicker)
+        if (TotalMissionClicks == maxClicksCount) {
             //next mission
-            Log.i("info", "Remaining Time Before: " + remainingTime.toString())
-            Log.i("info", "Time Remaining = " + remainingTime.toDouble().toString())
+            Log.i("info", "Current Duration: " + currentDuration.toString())
             DatabaseFunctions.accessUserDocument(this@GameActivity) { userDocument ->
                 if (userDocument != null) {
                     Log.i("info", "Mission Complete")
                     val dbCurrentLevel: Long? = userDocument.currentLevel
                     val currentLevel: Int = dbCurrentLevel?.toInt() ?: 0
                     val currentMission = userDocument.currentMission ?: "0.0"
-                    var newCurMissionAfterLevel: String? = getNextCurrentMissionAfterLevel(currentMission)
                     var newLevel: Int? = GameFunctions.getNextLevel(currentLevel)
+                    var newCurMissionAfterLevel: String? = getNextCurrentMissionAfterLevel(newLevel.toString())
+                    Log.d("Game Debug", "newCurrMissionAfterLevel: "+newCurMissionAfterLevel.toString())
                     if (newCurMissionAfterLevel != null && newLevel != null && currentLevel!=4) {
-                        Log.i("DatabaseFunctions", "Remaining Time Before: " + remainingTime.toString())
-                        Log.i("DatabaseFunctions", "Time Remaining = " + remainingTime.toDouble().toString())
                         levelCompleted(
                             this@GameActivity,
                             newLevel.toLong(),
                             newCurMissionAfterLevel,
-                            0.00,
-                            TotalMissionClicks.toLong(),
-                            remainingTime.toDouble()
+                            0L,
+                            0L,
+                            currentDuration
                         )
                         /*Toast.makeText(this@GameActivity,
                                 "Current Level: " + newLevel.toString() +
                                 " Current Mission: " + newCurMissionAfterLevel +
                                 " TotalMissionClicks: " + TotalMissionClicks +
-                                " Duration: " + remainingTime.toString(),
+                                " Duration: " + GameFunctions.getElapsedTime().toString(),
                             Toast.LENGTH_LONG).show();*/
-                        Log.d("Current Level", currentLevel.toString())
                         if(newLevel==4) {
                             DatabaseFunctions.calculateTotalTimeCompleted(this)
                         }
+                        GameFunctions.stopCountupTimer()
+                        //TotalMissionClicks = 0
                     }
                 }
             }
-
-            stopCountdownTimer() // Stop the countdown timer when the activity is destroyed
-            TotalMissionClicks = 0;
-            Clicks = 0;
-
-            startCountdownTimer(txtTime)
-        } else if (Clicks % MissionReq == 0 && Clicks < maxClicksCount && Clicks != 0) {
-            //Sub Mission = Complete
             displayStoryline(storylineContainer, txtStoryline, btnStoryline, btnClicker)
+        } else if (TotalMissionClicks % MissionReq == 0 && TotalMissionClicks < maxClicksCount && TotalMissionClicks != 0) {
+            //Sub Mission = Complete
+            Log.i("info", "Sub Mission Complete")
             DatabaseFunctions.accessUserDocument(this@GameActivity){ userDocument ->
                 if (userDocument != null){
                     val currentMission = userDocument.currentMission?: "0.0"
                     var newCurMission: String? = GameFunctions.getNextCurrentMission(currentMission)
                     if (newCurMission != null && newCurMission!="4.1") {
-                        Log.i("info", "Current Mission: " + newCurMission + " TotalMissionClicks: " + TotalMissionClicks + "Duration: " + remainingTime.toString())
-                        subMissionCompleted(this@GameActivity, newCurMission, remainingTime.toDouble(), TotalMissionClicks.toLong())
-                        //Toast.makeText(this@GameActivity, "Current Mission: " + newCurMission + " TotalMissionClicks: " + TotalMissionClicks + "Duration: " + remainingTime.toString(), Toast.LENGTH_SHORT).show();
+                        Log.i("info", "Current Mission: " + newCurMission + " TotalMissionClicks: " + TotalMissionClicks + "Duration: " + currentDuration.toString())
+                        subMissionCompleted(
+                            this@GameActivity, newCurMission,
+                            currentDuration,
+                            TotalMissionClicks.toLong()
+                        )
+                        //Toast.makeText(this@GameActivity, "Current Mission: " + newCurMission + " TotalMissionClicks: " + TotalMissionClicks + "Duration: " + GameFunctions.getElapsedTime().toString(), Toast.LENGTH_SHORT).show();
                     }
                 }
             }
+            displayStoryline(storylineContainer, txtStoryline, btnStoryline, btnClicker)
         }
 
         if (TotalMissionClicks >= 0) {
             if (buffer == 0) {
-                startCountdownTimer(txtTime)
                 buffer++
+            }
+        }
+
+        // Remove if no cps
+        if(toIncrement) {
+            TotalMissionClicks += boost
+        }
+    }
+
+    // Game Options Listener functions
+    override fun onContinueToGameClicked() {
+        GameFunctions.resumeCountupTimer(txtTime, storylineContainer, isCountdownRunning)
+        if (isCountdownRunning) {
+            CountdownBG.resumeAnimation()
+        }
+    }
+
+    override fun onBackToHomeClicked() {
+        if(!isCountdownRunning) {
+            GameFunctions.stopCountupTimer()
+            DatabaseFunctions.accessUserDocument(this) { userDocument ->
+                if (userDocument != null) {
+                    val dbCurrentMission = userDocument.currentMission.toString()
+                    subMissionCompleted(this@GameActivity, dbCurrentMission, currentDuration, TotalMissionClicks.toLong())
+                }
             }
         }
     }
@@ -665,11 +757,11 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback, GameOptionsActivi
         if (!isBeatAnimationRunning) {
             isBeatAnimationRunning = true
             // Scale up animation
-            val scaleUpX = ObjectAnimator.ofFloat(lottieView, View.SCALE_X, 1.0f, 1.1f)
-            val scaleUpY = ObjectAnimator.ofFloat(lottieView, View.SCALE_Y, 1.0f, 1.1f)
+            val scaleUpX = ObjectAnimator.ofFloat(lottieView, View.SCALE_X, 1.0f, 1.2f)
+            val scaleUpY = ObjectAnimator.ofFloat(lottieView, View.SCALE_Y, 1.0f, 1.2f)
             // Scale down animation
-            val scaleDownX = ObjectAnimator.ofFloat(lottieView, View.SCALE_X, 1.1f, 1.0f)
-            val scaleDownY = ObjectAnimator.ofFloat(lottieView, View.SCALE_Y, 1.1f, 1.0f)
+            val scaleDownX = ObjectAnimator.ofFloat(lottieView, View.SCALE_X, 1.2f, 1.0f)
+            val scaleDownY = ObjectAnimator.ofFloat(lottieView, View.SCALE_Y, 1.2f, 1.0f)
             // Create the animation sets
             val scaleUp = AnimatorSet().apply {
                 play(scaleUpX).with(scaleUpY)
