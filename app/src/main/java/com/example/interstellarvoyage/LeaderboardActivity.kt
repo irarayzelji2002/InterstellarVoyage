@@ -193,7 +193,10 @@ class LeaderboardActivity : AppCompatActivity(), MusicPlayerCallback {
 
                         Log.d("All Levels Leaderboard", "Rank: $rank, UserId: $userId, Username: $username, Time Completed: $timeCompleted")
                         txtUsername.setText("$username")
-                        txtTime.setText("$timeCompleted")
+                        val seconds = timeCompleted.toLong()
+                        val minutes = seconds / 60
+                        val remainingSeconds = seconds % 60
+                        txtTime.text = String.format("%02d:%02d", minutes, remainingSeconds)
 
                         // Remove visibility if user is in top 5
                         if (userUserId == userId) {
@@ -240,7 +243,10 @@ class LeaderboardActivity : AppCompatActivity(), MusicPlayerCallback {
 
                         Log.d("Level3 Leaderboard", "Rank: $rank, UserId: $userId, Username: $username, Time Completed: $timeCompleted")
                         txtUsername.setText("$username")
-                        txtTime.setText("$timeCompleted")
+                        val seconds = timeCompleted.toLong()
+                        val minutes = seconds / 60
+                        val remainingSeconds = seconds % 60
+                        txtTime.text = String.format("%02d:%02d", minutes, remainingSeconds)
 
                         // Remove visibility if user is in top 5
                         if (userUserId == userId) {
@@ -287,7 +293,10 @@ class LeaderboardActivity : AppCompatActivity(), MusicPlayerCallback {
 
                         Log.d("Level2 Leaderboard", "Rank: $rank, UserId: $userId, Username: $username, Time Completed: $timeCompleted")
                         txtUsername.setText("$username")
-                        txtTime.setText("$timeCompleted")
+                        val seconds = timeCompleted.toLong()
+                        val minutes = seconds / 60
+                        val remainingSeconds = seconds % 60
+                        txtTime.text = String.format("%02d:%02d", minutes, remainingSeconds)
 
                         // Remove visibility if user is in top 5
                         if (userUserId == userId) {
@@ -334,7 +343,10 @@ class LeaderboardActivity : AppCompatActivity(), MusicPlayerCallback {
 
                         Log.d("Level1 Leaderboard", "Rank: $rank, UserId: $userId, Username: $username, Time Completed: $timeCompleted")
                         txtUsername.setText("$username")
-                        txtTime.setText("$timeCompleted")
+                        val seconds = timeCompleted.toLong()
+                        val minutes = seconds / 60
+                        val remainingSeconds = seconds % 60
+                        txtTime.text = String.format("%02d:%02d", minutes, remainingSeconds)
 
                         // Remove visibility if user is in top 5
                         if (userUserId == userId) {
@@ -381,7 +393,10 @@ class LeaderboardActivity : AppCompatActivity(), MusicPlayerCallback {
 
                         Log.d("Level0Leaderboard", "Rank: $rank, UserId: $userId, Username: $username, Time Completed: $timeCompleted")
                         txtUsername.setText("$username")
-                        txtTime.setText("$timeCompleted")
+                        val seconds = timeCompleted.toLong()
+                        val minutes = seconds / 60
+                        val remainingSeconds = seconds % 60
+                        txtTime.text = String.format("%02d:%02d", minutes, remainingSeconds)
 
                         // Remove visibility if user is in top 5
                         if (userUserId == userId) {

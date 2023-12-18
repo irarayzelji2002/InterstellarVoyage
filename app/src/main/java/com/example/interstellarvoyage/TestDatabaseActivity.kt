@@ -198,7 +198,7 @@ class TestDatabaseActivity : AppCompatActivity() {
         }
 
         btnCalculateTotalTimeCompleted.setOnClickListener {
-            DatabaseFunctions.calculateTotalTimeCompleted(this)
+
         }
 
     //Don't Delete below this

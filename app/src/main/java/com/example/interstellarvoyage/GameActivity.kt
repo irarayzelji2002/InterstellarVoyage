@@ -259,7 +259,7 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback, GameOptionsActivi
                         disableStoryline = false
                         GameFunctions.resumeCountupTimer(txtTime, storylineContainer, isCountdownRunning)
                     }
-                    
+
                     Log.d("Storyline next", toChangeMusic.toString())
                     if(toChangeMusic == true) {
                         GameFunctions.stopCountupTimer()
@@ -569,22 +569,26 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback, GameOptionsActivi
         Log.d("Game Debug", TotalMissionClicks.toString() +" % "+MissionReg.toString()+" before boost: "+boost.toString())
         Log.d("Game Debug", TotalMissionClicks.toString() +" == "+maxClicksCount.toString()+" before boost: "+boost.toString())
 
-        // Remove if no cps
-        /*if (((TotalMissionClicks + boost) % MissionReg == 5 ||
-            (TotalMissionClicks + boost) % MissionReg == 10 ||
-            (TotalMissionClicks + boost) % MissionReg == 15 ||
-            (TotalMissionClicks + boost) % MissionReg == 20 ||
-            (TotalMissionClicks + boost) % MissionReg == 25) &&
-            TotalMissionClicks != 0)
-        {
-            TotalMissionClicks = MissionReg
-            toIncrement = true
-        } else if((TotalMissionClicks + boost) > maxClicksCount) {
-            TotalMissionClicks = maxClicksCount
-            toIncrement = true
-        } else  {
-            TotalMissionClicks += boost
-        }*/
+        //ADJUST CLICKS WITH BOOST
+        val effectiveClicks = TotalMissionClicks
+        val effectiveClicksWithBoost = effectiveClicks + boost
+
+        if (effectiveClicks % MissionReq == 0 && effectiveClicks < maxClicksCount && effectiveClicks != 0) { // FOR SUB MISSION
+            if (effectiveClicksWithBoost % MissionReg != 0) {
+                // Calculate the excess clicks beyond the next sub-mission completion
+                val excessClicks = effectiveClicksWithBoost % MissionReq
+                // Subtract the excess clicks to ensure the condition is satisfied
+                TotalMissionClicks = TotalMissionClicks + boost - excessClicks
+            } else {
+                TotalMissionClicks += boost
+            }
+        } else if (effectiveClicks == maxClicksCount) { // FOR LEVEL
+            if (effectiveClicksWithBoost > maxClicksCount) {
+                TotalMissionClicks = maxClicksCount
+            } else {
+                TotalMissionClicks += boost
+            }
+        }
 
         Log.d("Game Debug", TotalMissionClicks.toString() +" % "+MissionReg.toString()+" after boost: "+boost.toString())
         Log.d("Game Debug", (TotalMissionClicks % MissionReq).toString())
@@ -620,7 +624,7 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback, GameOptionsActivi
                                 " Duration: " + GameFunctions.getElapsedTime().toString(),
                             Toast.LENGTH_LONG).show();*/
                         if(newLevel==4) {
-                            DatabaseFunctions.calculateTotalTimeCompleted(this)
+                            DatabaseFunctions.calculateTotalTimeCompleted(this, currentDuration)
                         }
                         GameFunctions.stopCountupTimer()
                         //TotalMissionClicks = 0
@@ -653,11 +657,6 @@ class GameActivity : AppCompatActivity(), MusicPlayerCallback, GameOptionsActivi
             if (buffer == 0) {
                 buffer++
             }
-        }
-
-        // Remove if no cps
-        if(toIncrement) {
-            TotalMissionClicks += boost
         }
     }
 

@@ -1405,7 +1405,7 @@ object DatabaseFunctions {
         }
     }
 
-    fun calculateTotalTimeCompleted(context: Context){
+    fun calculateTotalTimeCompleted(context: Context, currentDuration: Long){
         val user = FirebaseAuth.getInstance().currentUser
 
         if (user != null) {
@@ -1445,7 +1445,7 @@ object DatabaseFunctions {
                         }
                         // Calculate sum
                         Log.d("FirestoreData", "Levels Timestamp: $timeCompletedForLevels")
-                        var sumOfTimeCompletedForLevels = level0Time!! + level1Time!! + level2Time!! + level3Time!!
+                        var sumOfTimeCompletedForLevels = level0Time!! + level1Time!! + level2Time!! + currentDuration
                         Log.d("Calculated Total", sumOfTimeCompletedForLevels.toString())
                         // Store to Firestore
                         userDocumentRef.update("totalTimeCompleted", sumOfTimeCompletedForLevels)
